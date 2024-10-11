@@ -16,15 +16,17 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
         
 class UtUTrainer(Trainer):
     def __init__(self, model, data, optimizer, args):
-        super().__init__(model, data, optimizer)
-        self.args= args
+        super().__init__(model, data, optimizer, args)
 
     def train(self):
         # no training for UtU, only inference
+        st = time.time()
         self.model = self.model.to(device)
         self.data = self.data.to(device)
         
-        test_acc, msc_rate, f1 = self.evaluate(is_dr=True)
+        test_acc, msc_rate, f1 = self.evaluate(is_dr=True, use_val=True)
+        end_time = time.time()
         print(f'Train Acc: {test_acc}, Misclassification: {msc_rate},  F1 Score: {f1}')
+        return test_acc, msc_rate, end_time-st
         
 
