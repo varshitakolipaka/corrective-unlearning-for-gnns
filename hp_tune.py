@@ -357,7 +357,7 @@ hp_tuning_params_dict = {
         # 'kd_T': (1, 10, "float"),
         "unlearn_lr": (1e-5, 1e-1, "log"),
         # "scrubAlpha": (1e-6, 10, "log"),
-        "msteps": (10, 100, "int"),
+        # "msteps": (10, 100, "int"),
         # 'weight_decay': (1e-5, 1e-1, "log"),
     },
     "scrub_no_kl_2": {

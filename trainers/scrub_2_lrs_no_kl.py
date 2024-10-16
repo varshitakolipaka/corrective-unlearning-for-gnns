@@ -161,9 +161,9 @@ class ScrubTrainer3(Trainer):
         while self.curr_step < self.opt.unlearn_iters:
             print("UNLEARNING STEP: ", self.curr_step, end='\r')
             iter_start_time = time.time()
-            if self.curr_step < self.opt.msteps:
-                self.maximize=True
-                self.train_one_epoch(data=self.poisoned_dataset, mask=forget_mask)
+
+            self.maximize=True
+            self.train_one_epoch(data=self.poisoned_dataset, mask=forget_mask)
                 
 
             self.maximize=False
