@@ -2,10 +2,10 @@
 
 - `attacks/`: Contains attack methods that are applied on the graph.
 - `framework/`: Core framework implementation and helper functions for GNN models and methods.
-- `models/`: Different GNN models like GCN, GAT, etc.
+- `models/`: Different GNN architectures like GCN, GAT, etc.
 - `trainers/`: Scripts for training different unlearning methods.
 - `best_params.json`: Stores the best hyperparameters for model tuning.
-- `classes_to_poison.json`: Contains class information for poisoning attacks.
+- `classes_to_poison.json`: Contains victim class information for poisoning attacks.
 - `hp_tune.py`: Hyperparameter tuning script.
 - `logger.py`: Logging utility for training and unlearning.
 - `main.py`: The main script to run training, attacks, and unlearning.
@@ -23,7 +23,7 @@ It's recommended to create a virtual environment to manage dependencies. The bel
 ### Step 2: Install Dependencies
 Once the virtual environment is activated, install the required dependencies by running:
 
-    pip install -r requirements.txt
+    pip install -r requirements.txt (or conda equivalent)
 
 This will install all the necessary packages required to run the project.
 
