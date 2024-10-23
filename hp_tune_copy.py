@@ -245,7 +245,7 @@ hp_tuning_params_dict = {
     "retrain": {
         "unlearn_lr": (1e-5, 1e-1, "log"),
         "weight_decay": (1e-5, 1e-1, "log"),
-        "unlearning_epochs": (600, 1400, "int"),
+        
     },
     "gnndelete": {
         "unlearn_lr": (1e-5, 1e-1, "log"),
@@ -392,7 +392,8 @@ hp_tuning_params_dict = {
     "clean": {
         "train_lr": (1e-5, 1e-1, "log"),
         "weight_decay": (1e-5, 1e-1, "log"),
-        "training_epochs": (500, 1600, "int"),
+        "training_epochs": (range(500, 1000, 50), "categorical"),
+        "heads": ([1, 2, 4, 8], "categorical"),
     },
 }
 
@@ -447,7 +448,9 @@ def objective_clean(trial, model, data):
     # Define the hyperparameters to tune
     set_hp_tuning_params(trial, is_clean=True)
 
-    model_internal = copy.deepcopy(model)
+    model_internal = utils.get_model(
+        args, data.num_features, args.hidden_dim, data.num_classes
+    )
 
     optimizer = torch.optim.Adam(
         model_internal.parameters(), lr=args.train_lr, weight_decay=args.weight_decay
@@ -469,6 +472,8 @@ def objective_clean(trial, model, data):
     trial.set_user_attr("forget_f1", forget_f1)
     trial.set_user_attr("util_f1", util_f1)
     trial.set_user_attr("time_taken", time_taken)
+    
+    print("time_taken: ", time_taken)
 
     # We want to minimize misclassification rate and maximize accuracy
     return obj
@@ -563,4 +568,4 @@ if __name__ == "__main__":
     # elif args.unlearning_model == "contrastive" or args.unlearning_model == "contra_2":
     #     study.optimize(objective_func, n_trials=200)
     else:
-        study.optimize(objective_func, n_trials=30)
+        study.optimize(objective_func, n_trials=50)

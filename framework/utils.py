@@ -70,7 +70,7 @@ def get_model(args, in_dim, hidden_dim, out_dim, mask_1hop=None, mask_2hop=None,
 
     else:
         model_mapping = {'gcn': GCN, 'gat': GAT, 'gin': GIN}
-        return model_mapping[args.gnn](in_dim=in_dim, hidden_dim=hidden_dim, out_dim=out_dim)
+        return model_mapping[args.gnn](in_dim=in_dim, hidden_dim=hidden_dim, out_dim=out_dim, heads=args.heads)
 
 
 def train_test_split(data, seed, train_ratio=0.1, val_ratio=0.1):

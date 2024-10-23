@@ -583,10 +583,10 @@ class ContrastiveUnlearnTrainer_NEW(Trainer):
                 iter_start_time = time.time()
                 self.model.train()
 
-                self.embeddings = self.model(
-                    self.data.x, self.data.edge_index
-                )
                 if i < args.contrastive_epochs_1:
+                    self.embeddings = self.model.get_last_layer_emb(
+                        self.data.x, self.data.edge_index
+                    )
                     optimizer.zero_grad()
                     # pos_dist, neg_dist = self.get_distances_batch()
                     # loss = self.contrastive_loss(

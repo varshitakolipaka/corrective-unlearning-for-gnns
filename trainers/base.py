@@ -66,7 +66,7 @@ class Trainer:
         self.unlearning_time = 0
         self.best_model_time = 0
 
-        self.TIME_THRESHOLD = 3 # 3 seconds
+        self.TIME_THRESHOLD = 7.5 # 3 seconds
         
         self.is_trigg_val = False
 
@@ -89,8 +89,10 @@ class Trainer:
     def train(self):
         losses = []
         self.data = self.data.to(device)
-        st = time.time()
+        time_taken = 0
+        best_val_score = 0
         for epoch in trange(self.num_epochs, desc="Epoch"):
+            iter_start = time.time()
             self.model.train()
             z = F.log_softmax(self.model(self.data.x, self.data.edge_index), dim=1)
             loss = F.nll_loss(
@@ -98,14 +100,15 @@ class Trainer:
             )
             loss.backward()
             losses.append(loss)
-            if epoch % 10 == 0:
-                print(f"Epoch: {epoch}, Loss: {loss.item()}")
             self.optimizer.step()
             self.optimizer.zero_grad()
-        time_taken = time.time() - st
+            
+            time_taken += time.time() - iter_start
+            
         train_acc, msc_rate, f1 = self.evaluate()
         # print(f'Train Acc: {train_acc}, Misclassification: {msc_rate},  F1 Score: {f1}')
         # plot_loss_vs_epochs(losses)
+        
         return train_acc, msc_rate, time_taken
 
     def all_class_acc(self):

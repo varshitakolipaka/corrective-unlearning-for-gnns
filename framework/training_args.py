@@ -14,7 +14,7 @@ def parse_args():
 
     parser.add_argument('--train_ratio', type=float, default=0.6, help='train ratio')
     parser.add_argument('--val_ratio', type=float, default=0.2, help='train ratio')
-    parser.add_argument('--attack_type', type=str, default='label', help='attack type', choices=["label", "edge", "random", "trigger", 'label_strong'])
+    parser.add_argument('--attack_type', type=str, default='label', help='attack type', choices=["label", "edge", "random", "trigger", 'label_strong', 'nettack'])
     parser.add_argument('--unlearning_model', type=str, default='scrub', help='unlearning method', choices=["original", "gradient_ascent", "gnndelete", "gnndelete_ni", "gif", "utu", "contrastive", "retrain", "scrub", "megu", "contra_2", "ssd", "grub", "yaum", 'contrascent', 'cacdc', 'scrub_no_kl_combined', 'scrub_no_kl', 'scrub_no_kl_2'])
     parser.add_argument('--gnn', type=str, default='gcn', help='GNN architecture', choices=['gcn', 'gat', 'gin'])
     # parser.add_argument('--in_dim', type=int, default=128, help='input dimension')
@@ -44,11 +44,15 @@ def parse_args():
     # Training
     # parser.add_argument("--suffix", type=str, default=None, help="name suffix for #wandb run")
     # parser.add_argument("--mode", type=str, default="disabled", help="#wandb mode")
-    parser.add_argument('--train_lr', type=float, default=0.005191475570177285, help='initial learning rate')
+    parser.add_argument('--train_lr', type=float, default=0.007990075961169008, help='initial learning rate')
     parser.add_argument('--unlearn_lr', type=float, default=0.015, help='unlearn learning rate')
-    parser.add_argument('--weight_decay', type=float, default=0.00016211813194850176, help='weight decay')
+    parser.add_argument('--weight_decay', type=float, default=0.000011020697848386563, help='weight decay')
     parser.add_argument('--optimizer', type=str, default='Adam', help='optimizer to use')
-    parser.add_argument('--training_epochs', type=int, default=1208, help='number of epochs to train')
+    
+    # GAT Heads
+    parser.add_argument('--heads', type=int, default=8, help='number of heads for GATConv')
+    
+    parser.add_argument('--training_epochs', type=int, default=700, help='number of epochs to train')
     parser.add_argument('--valid_freq', type=int, default=30, help='# of epochs to do validation')
     parser.add_argument('--checkpoint_dir', type=str, default='./checkpoint', help='checkpoint folder')
     parser.add_argument('--alpha', type=float, default=0.5, help='alpha in loss function')

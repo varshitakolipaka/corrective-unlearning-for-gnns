@@ -62,6 +62,7 @@ def process_data(csv_files):
         print(f"Error: Column {e} not found in the CSV file.")
     except Exception as e:
         print(f"An unexpected error occurred while processing the data: {e}")
+        
     return pd.DataFrame(data)
 
 
@@ -90,7 +91,18 @@ def plot_forget_scores(df, folder):
         # sort methods to ensure consistent color assignment
         methods = sorted(methods)
         
-        return {method: colors[i] for i, method in enumerate(methods)}
+        cols = {method: colors[i] for i, method in enumerate(methods)}
+        
+        # assign poisoned and original manually
+        cols['poisoned'] = 'red'
+        cols['original'] = 'blue'
+        
+        return cols
+    
+    baselines = ['utu', 'scrub', 'megu', 'gif', 'gnndelete', 'yaum']
+    
+    # add a column to indicate if the method is a baseline
+    df['is_baseline'] = df['method'].apply(lambda x: x in baselines)
     
     try:
         sns.set(style="whitegrid")
@@ -101,9 +113,9 @@ def plot_forget_scores(df, folder):
             y='forget_mean',
             hue='method',
             palette=assign_method_color(df['method'].unique()),
-            style='method',
+            style='is_baseline',
             markers=True,
-            dashes=False
+            dashes=True
         )
         
         # add error bars
@@ -144,6 +156,9 @@ def main(folder):
         return
 
     df = process_data(csv_files)
+    
+    # 
+    
     if df.empty:
         print("No valid data to plot.")
         return

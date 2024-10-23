@@ -11,6 +11,7 @@ from trainers.base import Trainer
 from attacks.edge_attack import edge_attack_specific_nodes
 from attacks.label_flip import label_flip_attack
 from attacks.feature_attack import trigger_attack
+from attacks.nettack import nettack_attack
 import optuna
 from optuna.samplers import TPESampler
 from functools import partial
@@ -225,6 +226,15 @@ def poison(clean_data=None):
             target_class=args.target_class,
             trigger_size=args.trigger_size,
         )
+    if args.attack_type == "nettack":
+        poisoned_data, poisoned_node = nettack_attack(
+            clean_data,
+            epsilon=args.df_size,
+            seed=args.random_seed,
+            target_node=args.target_node
+        )
+        poisoned_indices = torch.tensor([poisoned_node])  # Track which node was attacked
+
 
     poisoned_data = poisoned_data.to(device)
 
@@ -356,12 +366,9 @@ if __name__ == "__main__":
     print("\n\n\n")
 
     print(args.dataset, args.attack_type)
-    clean_data = train(load=True)
-    # clean_data = train()
-    
-    
-    poisoned_data, poisoned_indices, poisoned_model = poison()
-    # exit()
+    # clean_data = train(load=True)
+    clean_data = train()
+    poisoned_data, poisoned_indices, poisoned_model = poison(clean_data)
 
     # load best params file
     with open("best_params.json", "r") as f:

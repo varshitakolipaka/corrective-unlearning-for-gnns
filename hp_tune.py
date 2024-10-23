@@ -243,7 +243,8 @@ hp_tuning_params_dict = {
     "retrain": {
         "unlearn_lr": (1e-5, 1e-1, "log"),
         "weight_decay": (1e-5, 1e-1, "log"),
-        "unlearning_epochs": (600, 1400, "int"),
+        "unlearning_epochs": (range(500, 1000, 50), "categorical"),
+        "heads": ([1, 2, 4, 8], "categorical"),
     },
     "gnndelete": {
         "unlearn_lr": (1e-5, 1e-1, "log"),
@@ -309,8 +310,8 @@ hp_tuning_params_dict = {
         "unlearn_lr": (1e-4, 1e-1, "log"),
         # "contrastive_margin": (1, 10, "log"),
         # "contrastive_lambda": (0.0, 1.0, "float"),
-        "contrastive_frac": (0.02, 0.8, "float"),
-        "k_hop": (1, 3, "int"),
+        "contrastive_frac": (0.02, 0.5, "float"),
+        "k_hop": (1, 2, "int"),
         # "ascent_lr": (1e-6, 1e-3, "log"),
         "descent_lr": (1e-4, 1e-1, "log"),
         # "scrubAlpha": (1e-6, 10, "log"),
@@ -332,13 +333,13 @@ hp_tuning_params_dict = {
     "cacdc": {
         "contrastive_epochs_1": (1, 10, "int"),
         "contrastive_epochs_2": (1, 30, "int"),
-        "steps": (1, 10, "int"),
+        "steps": (1, 15, "int"),
         # "maximise_epochs": (5, 30, "int"),
         "unlearn_lr": (1e-4, 1e-1, "log"),
         # "contrastive_margin": (1, 10, "log"),
         # "contrastive_lambda": (0.0, 1.0, "float"),
-        "contrastive_frac": (0.02, 0.8, "float"),
-        "k_hop": (1, 3, "int"),
+        "contrastive_frac": (0.02, 0.5, "float"),
+        "k_hop": (1, 2, "int"),
         "ascent_lr": (1e-6, 1e-3, "log"),
         "descent_lr": (1e-4, 1e-1, "log"),
         # "scrubAlpha": (1e-6, 10, "log"),
@@ -450,10 +451,6 @@ def objective(trial, model, data):
 if __name__ == "__main__":
     print("\n\n\n")
     print(args.dataset, args.attack_type)
-    if args.gnn == "gat":
-        args.train_lr = 0.06270178773628353
-        args.training_epochs = 1143
-        args.weight_decay = 0.00002
 
     clean_data = train(load=True)
     # clean_data = train()
@@ -516,6 +513,12 @@ if __name__ == "__main__":
     objective_func = partial(objective, model=model, data=poisoned_data)
 
     print("==HYPERPARAMETER TUNING==")
+    
+    # optuna.delete_study(
+    #     study_name=f"{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{args.unlearning_model}_{args.random_seed}_{class_dataset_dict[args.dataset]['class1']}_{class_dataset_dict[args.dataset]['class2']}",
+    #     storage=f"sqlite:///hp_tuning/new/{args.db_name}.db",
+    # )
+    
     # Create a study with TPE sampler
     study = optuna.create_study(
         sampler=TPESampler(seed=42),
@@ -524,6 +527,8 @@ if __name__ == "__main__":
         load_if_exists=True,
         storage=f"sqlite:///hp_tuning/new/{args.db_name}.db",
     )
+    
+
 
     print("==OPTIMIZING==")
 
@@ -532,7 +537,7 @@ if __name__ == "__main__":
     # reduce trials for utu and contrastive
     if args.unlearning_model == "utu":
         study.optimize(objective_func, n_trials=1)
-    elif args.unlearning_model == "retrain":
+    elif args.unlearning_model == "retrain" or args.unlearning_model == "gif":
         study.optimize(objective_func, n_trials=30)
     # elif args.unlearning_model == "contrastive" or args.unlearning_model == "contra_2":
     #     study.optimize(objective_func, n_trials=200)

@@ -79,6 +79,7 @@ class GATDelete(GAT):
         self.conv1.requires_grad = False
         self.conv2.requires_grad = False
         self.conv3.requires_grad = False
+        self.lin.requires_grad = False
 
     def forward(self, x, edge_index, mask_1hop=None, mask_2hop=None, mask_3hop=None, return_all_emb=False):
         x1 = self.conv1(x, edge_index)
@@ -91,10 +92,13 @@ class GATDelete(GAT):
 
         x3 = self.conv3(x2, edge_index)
         x3 = self.deletion3(x3, mask_3hop)
+        x3 = F.relu(x3)
+        
+        x4 = self.lin(x3)
 
         if return_all_emb:
             return x1, x2, x3
-        return x3
+        return x4
 
     def get_original_embeddings(self, x, edge_index, return_all_emb=False):
         return super().forward(x, edge_index, return_all_emb)

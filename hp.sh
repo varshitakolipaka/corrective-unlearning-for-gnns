@@ -2,7 +2,7 @@ python run_hp_tune.py --dataset Cora --df_size 0.5 --random_seed 0 --data_dir /s
 
 python eval_script.py --gnn gcn --dataset Cora --attack_type label --db_name label_acdc_abl_0.75 --cf 0.75 --log_name acdc_ablations --start_seed 0 --end_seed 5 --yaum --scrub_no_kl_2
 
-python run_hp_tune.py --dataset Cora --df_size 0.5 --random_seed 0 --data_dir /scratch/akshit.sinha/data3 --attack_type label --db_name label_acdc_abl_0.05 --cf 0.05 --gnn gcn --yaum --scrub_no_kl_2
+python run_hp_tune.py --dataset Cora --df_size 0.5 --random_seed 0 --data_dir /scratch/akshit.sinha/data3 --attack_type label --db_name label_acdc_abl_0.05 --cf 0.05 --gnn gcn --yaum --scrub_no_kl_2 
 
 python eval_script.py --gnn gcn --dataset Cora --attack_type label --db_name label_acdc_abl_0.05 --cf 0.05 --log_name acdc_ablations --start_seed 0 --end_seed 5 --yaum --scrub_no_kl_2
 

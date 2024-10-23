@@ -18,6 +18,110 @@ from torch_geometric.utils import (
 from torch_geometric.loader import GraphSAINTRandomWalkSampler
 from torch.optim.lr_scheduler import _LRScheduler
 from .base import Trainer
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
+import seaborn as sns
+
+def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test", name=""):
+    # Set the model to evaluation mode
+    model.eval()
+
+    if is_dr:
+        edge_index = data.edge_index[:, data.dr_mask]
+    else:
+        edge_index = data.edge_index
+
+    # Forward pass: get embeddings
+    with torch.no_grad():
+        pre_embeddings = model.get_last_layer_emb(data.x, edge_index)
+
+    # If embeddings have more than 2 dimensions, apply t-SNE
+    if pre_embeddings.shape[1] > 2:
+        pre_embeddings = TSNE(n_components=2).fit_transform(pre_embeddings.cpu())
+        pre_embeddings = torch.tensor(pre_embeddings).to(device)
+
+    # Get the mask (either test, train, or val)
+    if mask == "test":
+        mask = data.test_mask
+    elif mask == "train":
+        mask = data.train_mask
+    else:
+        mask = data.val_mask
+
+    # Filter embeddings and labels based on the mask
+    pre_embeddings = pre_embeddings[mask]
+    labels = data.y[mask]
+
+    # Convert embeddings to numpy for processing
+    pre_embeddings = pre_embeddings.cpu().numpy()
+    # # Flip embeddings vertically by multiplying the y-dimension (2nd column) by -1
+    # pre_embeddings[:, 0] = -pre_embeddings[:, 0]
+
+    # Create masks for class1, class2, and other classes
+    class1_mask = (labels == class1).cpu().numpy()
+    class2_mask = (labels == class2).cpu().numpy()
+
+    # Get unique class labels (excluding class1 and class2)
+    unique_classes = torch.unique(labels).cpu().numpy()
+    other_classes = [c for c in unique_classes if c != class1 and c != class2]
+
+    plt.figure(figsize=(8, 8), tight_layout=True)
+    sns.set(style="whitegrid")
+
+    plt.grid(True, linestyle='-', alpha=0.7)
+
+    # Convert labels to numpy for processing
+    labels = labels.cpu().numpy()
+
+    # Generate a color palette for all classes
+    color_palette = sns.color_palette("pastel", len(unique_classes))
+
+    # Plot each class with its unique color (non-poisoned classes will have reduced opacity)
+    for i, cls in enumerate(other_classes):
+        class_mask = (labels == cls)
+        plt.scatter(
+            pre_embeddings[class_mask, 0], 
+            pre_embeddings[class_mask, 1], 
+            color=color_palette[i], 
+            alpha=0.25,  # Slightly lower opacity for non-poisoned classes
+            s=50
+        )
+
+    # Plot class1 (poisoned class)
+    plt.scatter(
+        pre_embeddings[class1_mask, 0], 
+        pre_embeddings[class1_mask, 1], 
+        color='blue', 
+        alpha=0.6, 
+        s=120, 
+        edgecolors='black', 
+        linewidths=2  # Thicker borders
+    )
+
+    # Plot class2 (poisoned class)
+    plt.scatter(
+        pre_embeddings[class2_mask, 0], 
+        pre_embeddings[class2_mask, 1], 
+        color='red', 
+        alpha=0.6, 
+        s=120, 
+        edgecolors='black', 
+        linewidths=2  # Thicker borders
+    )
+
+    # Keep x-axis and y-axis ticks without labels and title
+    plt.xticks(ticks=plt.xticks()[0], labels=[''] * len(plt.xticks()[0]))  # Remove x-axis labels
+    plt.yticks(ticks=plt.yticks()[0], labels=[''] * len(plt.yticks()[0]))  # Remove y-axis labels
+    plt.title('')  # Remove title
+    plt.gca().legend().set_visible(False)  # Remove legend
+
+    # Ensure the grid is visible
+    plt.grid(True)
+
+    # Save the plot
+    os.makedirs("./plots", exist_ok=True)
+    plt.savefig(f"./plots/{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}_{name}_embeddings.png", format='png', bbox_inches='tight')
+    plt.show()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -39,6 +143,7 @@ class_dataset_dict = {
         "class2": 12,
     },
 }
+
 
 def time_it(func):
     def wrapper(*args, **kwargs):
@@ -223,13 +328,12 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         neg_loss = F.relu(torch.mean((margin - neg_dist)))
         loss = pos_loss + neg_loss
         return loss
-    
+
     def sage_loss(self, anchors, pos_embs, neg_embs):
-        pos_loss = F.logsigmoid((anchors*pos_embs).sum(-1)).mean()
-        neg_loss = F.logsigmoid(-(anchors*neg_embs).sum(-1)).mean()
-        
+        pos_loss = F.logsigmoid((anchors * pos_embs).sum(-1)).mean()
+        neg_loss = F.logsigmoid(-(anchors * neg_embs).sum(-1)).mean()
+
         return -pos_loss - neg_loss
-        
 
     def kd_loss(self):
         with torch.no_grad():
@@ -257,8 +361,12 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         # Vectorized contrastive loss calculation
 
         anchors = self.embeddings[nodes].unsqueeze(1)  # Shape: (N, 1, D)
-        positives = self.embeddings[positive_samples] * self.mask_pos  # Shape: (N, P, D)
-        negatives = self.embeddings[negative_samples] * self.mask_neg # Shape: (N, Q, D)
+        positives = (
+            self.embeddings[positive_samples] * self.mask_pos
+        )  # Shape: (N, P, D)
+        negatives = (
+            self.embeddings[negative_samples] * self.mask_neg
+        )  # Shape: (N, Q, D)
 
         # Euclidean distance between anchors and positives and take mean
         pos_dist = torch.mean(torch.norm(anchors - positives, dim=-1), dim=-1)
@@ -339,20 +447,30 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     for s in batch_negative_samples
                 ]
             )
-                
-            self.mask_pos = torch.stack(
-                [
-                    torch.tensor([1] * len(s) + [0] * (max_pos - len(s)))
-                    for s in batch_positive_samples
-                ]
-            ).float().unsqueeze(-1).to(device)
 
-            self.mask_neg = torch.stack(
-                [
-                    torch.tensor([1] * len(s) + [0] * (max_neg - len(s)))
-                    for s in batch_negative_samples
-                ]
-            ).float().unsqueeze(-1).to(device)
+            self.mask_pos = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_pos - len(s)))
+                        for s in batch_positive_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
+
+            self.mask_neg = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_neg - len(s)))
+                        for s in batch_negative_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
 
             st_2 = time.time()
             try:
@@ -370,7 +488,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         # print(f"Average time taken to get distances: {(time.time() - st)/num_samples}")
 
         return pos_dist, neg_dist
-    
+
     def run_sage_batch(self, batch_size=128):
         st = time.time()
 
@@ -389,13 +507,15 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
 
             # Vectorize batch_positive_samples
             batch_positive_samples = [
-                list(self.subset_dict[idx.item()] - attacked_set) 
+                list(self.subset_dict[idx.item()] - attacked_set)
                 for idx in batch_indices
             ]
-            
+
             # Max lengths can be computed once per loop iteration
             max_pos = max(len(s) for s in batch_positive_samples)
-            max_neg = len(attacked_list)  # Always fixed since attacked_set size won't change
+            max_neg = len(
+                attacked_list
+            )  # Always fixed since attacked_set size won't change
 
             # Preallocate memory for tensors
             batch_pos = torch.zeros((batch_size, max_pos), dtype=torch.long)
@@ -411,7 +531,9 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
             # Move everything to the correct device
             device = self.embeddings.device
             batch_pos, batch_neg = batch_pos.to(device), batch_neg.to(device)
-            mask_pos, mask_neg = mask_pos.to(device).unsqueeze(-1), mask_neg.to(device).unsqueeze(-1)
+            mask_pos, mask_neg = mask_pos.to(device).unsqueeze(-1), mask_neg.to(
+                device
+            ).unsqueeze(-1)
 
             st_2 = time.time()
             try:
@@ -427,7 +549,6 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
             total_loss += batch_loss
 
         return total_loss
-
 
     def get_distances_edge(self, batch_size=64):
         # attacked edge index contains all the edges that were maliciously added
@@ -468,20 +589,30 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     for s in batch_negative_samples
                 ]
             )
-            
-            self.mask_pos = torch.stack(
-                [
-                    torch.tensor([1] * len(s) + [0] * (max_pos - len(s)))
-                    for s in batch_positive_samples
-                ]
-            ).float().unsqueeze(-1).to(device)
 
-            self.mask_neg = torch.stack(
-                [
-                    torch.tensor([1] * len(s) + [0] * (max_neg - len(s)))
-                    for s in batch_negative_samples
-                ]
-            ).float().unsqueeze(-1).to(device)
+            self.mask_pos = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_pos - len(s)))
+                        for s in batch_positive_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
+
+            self.mask_neg = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_neg - len(s)))
+                        for s in batch_negative_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
 
             # st_2 = time.time()
             batch_pos_dist, batch_neg_dist = self.calc_distances(
@@ -493,7 +624,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
             neg_dist[batch_indices] = batch_neg_dist.to(neg_dist.device)
 
         return pos_dist, neg_dist
-    
+
     def run_sage_batch_edge(self, batch_size=64):
         # attacked edge index contains all the edges that were maliciously added
         num_masks = len(self.data.train_mask)
@@ -516,7 +647,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
             batch_negative_samples = [
                 list(self.negative_sample_dict[idx.item()]) for idx in batch_indices
             ]
-            
+
             # Pad and create dense batches
             max_pos = max(len(s) for s in batch_positive_samples)
             max_neg = max(len(s) for s in batch_negative_samples)
@@ -533,20 +664,30 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     for s in batch_negative_samples
                 ]
             )
-            
-            self.mask_pos = torch.stack(
-                [
-                    torch.tensor([1] * len(s) + [0] * (max_pos - len(s)))
-                    for s in batch_positive_samples
-                ]
-            ).float().unsqueeze(-1).to(device)
 
-            self.mask_neg = torch.stack(
-                [
-                    torch.tensor([1] * len(s) + [0] * (max_neg - len(s)))
-                    for s in batch_negative_samples
-                ]
-            ).float().unsqueeze(-1).to(device)
+            self.mask_pos = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_pos - len(s)))
+                        for s in batch_positive_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
+
+            self.mask_neg = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_neg - len(s)))
+                        for s in batch_negative_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
 
             try:
                 anchor_embs = self.embeddings[batch_indices].unsqueeze(1)
@@ -555,7 +696,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                 batch_loss = self.sage_loss(anchor_embs, pos_embs, neg_embs)
             except:
                 continue
-            
+
             total_loss += batch_loss
 
         return total_loss
@@ -575,6 +716,9 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         descent_optimizer = torch.optim.Adam(
             self.model.parameters(), lr=args.descent_lr
         )
+        
+        # # plot embeddings
+        # plot_embeddings(args, self.model, self.data, class1=class_dataset_dict[args.dataset]["class1"], class2=class_dataset_dict[args.dataset]["class2"], is_dr=True, mask="test", name=f"unlearning_og")
 
         # attacked idx must be a list of nodes
         for epoch in trange(args.steps, desc="Unlearning"):
@@ -583,10 +727,10 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                 iter_start_time = time.time()
                 self.model.train()
 
-                self.embeddings = self.model(
-                    self.data.x, self.data.edge_index
-                )
                 if i < args.contrastive_epochs_1:
+                    self.embeddings = self.model.get_last_layer_emb(
+                        self.data.x, self.data.edge_index
+                    )
                     optimizer.zero_grad()
                     # pos_dist, neg_dist = self.get_distances_batch()
                     # loss = self.contrastive_loss(
@@ -597,6 +741,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     loss.backward()
                     optimizer.step()
                 else:
+                    self.embeddings = self.model(self.data.x, self.data.edge_index)
                     ascent_optimizer.zero_grad()
 
                     ascent_loss = self.ascent_loss(self.data.poison_mask)
@@ -613,7 +758,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     # self.embeddings = self.model(
                     #     self.data.x, self.data.edge_index # TESTING
                     # )
-                    
+
                     finetune_loss = F.cross_entropy(
                         self.embeddings[self.data.retain_mask],
                         self.data.y[self.data.retain_mask],
@@ -624,14 +769,17 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     descent_loss.backward()
                     descent_optimizer.step()
                     # descent_scheduler.step()
-                    
+
                 # save best model
                 self.unlearning_time += time.time() - iter_start_time
                 cutoff = self.save_best(is_dr=True)
                 if cutoff:
                     self.load_best()
                     return
-        
+            
+            # plot embeddings
+            # plot_embeddings(args, self.model, self.data, class1=class_dataset_dict[args.dataset]["class1"], class2=class_dataset_dict[args.dataset]["class2"], is_dr=True, mask="test", name=f"unlearning_{epoch}")
+
         # load best model
         self.load_best()
 
@@ -639,7 +787,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         # attack idx must be a list of tuples (u,v)
         args = self.args
         optimizer = self.optimizer
-        
+
         ascent_optimizer = torch.optim.Adam(self.model.parameters(), lr=args.ascent_lr)
 
         descent_optimizer = torch.optim.Adam(
@@ -652,9 +800,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                 self.model.train()
                 optimizer.zero_grad()
 
-                self.embeddings = self.model(
-                    self.data.x, self.data.edge_index
-                )
+                self.embeddings = self.model(self.data.x, self.data.edge_index)
                 if i < args.contrastive_epochs_1:
                     # pos_dist, neg_dist = self.get_distances_edge()
                     # lmda = 0
@@ -662,7 +808,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     #     pos_dist, neg_dist, margin=args.contrastive_margin, lmda=lmda
                     # )
                     loss = self.run_sage_batch_edge()
-                    
+
                     optimizer.zero_grad()
                     loss.backward()
                     optimizer.step()
@@ -678,9 +824,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     descent_optimizer.zero_grad()
 
                     if self.args.linked:
-                        self.embeddings = self.model(
-                            self.data.x, self.data.edge_index
-                        )
+                        self.embeddings = self.model(self.data.x, self.data.edge_index)
                     else:
                         self.embeddings = self.model(
                             self.data.x, self.data.edge_index[:, self.data.dr_mask]
@@ -706,7 +850,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                         cutoff = self.save_best()
                         if cutoff:
                             break
-            
+
         # load best model
         self.load_best()
 
@@ -723,15 +867,23 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
             self.train_node()
         elif self.args.request == "edge":
             self.train_edge()
-        
+
         if self.args.linked:
             is_dr = False
         else:
             is_dr = True
         train_acc, msc_rate, f1 = self.evaluate(is_dr=is_dr, use_val=True)
 
-        print(f"Training time: {self.best_model_time}, Train Acc: {train_acc}, Msc Rate: {msc_rate}, F1: {f1}")
-        forg, util, forg_f1, util_f1 = self.get_score(self.args.attack_type, class1=class_dataset_dict[self.args.dataset]["class1"], class2=class_dataset_dict[self.args.dataset]["class2"])
-        print(f"Forgotten: {forg}, Util: {util}, Forg F1: {forg_f1}, Util F1: {util_f1}")        
+        print(
+            f"Training time: {self.best_model_time}, Train Acc: {train_acc}, Msc Rate: {msc_rate}, F1: {f1}"
+        )
+        forg, util, forg_f1, util_f1 = self.get_score(
+            self.args.attack_type,
+            class1=class_dataset_dict[self.args.dataset]["class1"],
+            class2=class_dataset_dict[self.args.dataset]["class2"],
+        )
+        print(
+            f"Forgotten: {forg}, Util: {util}, Forg F1: {forg_f1}, Util F1: {util_f1}"
+        )
 
         return train_acc, msc_rate, self.best_model_time
