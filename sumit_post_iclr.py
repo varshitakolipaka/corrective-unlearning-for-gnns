@@ -11,13 +11,13 @@ from trainers.base import Trainer
 from attacks.edge_attack import edge_attack_specific_nodes
 from attacks.label_flip import label_flip_attack
 from attacks.feature_attack import trigger_attack
+from attacks.metattack import metattack
 import optuna
 from optuna.samplers import TPESampler
 from functools import partial
 from logger import Logger
 
 args = parse_args()
-
 
 utils.seed_everything(args.random_seed)
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -79,26 +79,13 @@ def train(load=False):
                 },
             )
 
-        # utils.plot_embeddings(
-        #     args,
-        #     clean_model,
-        #     clean_data,
-        #     class1=class_dataset_dict[args.dataset]["class1"],
-        #     class2=class_dataset_dict[args.dataset]["class2"],
-        #     is_dr=False,
-        #     name=f"clean_other",
-        # )
-
         return clean_data
 
     # dataset
     print("==TRAINING==")
     clean_data = utils.get_original_data(args.dataset)
-    # utils.train_test_split(
-    #     clean_data, args.random_seed, args.train_ratio, args.val_ratio
-    # )
     utils.train_test_split(
-        clean_data, model_seeds[args.dataset], args.train_ratio, args.val_ratio
+        clean_data, args.random_seed, args.train_ratio, args.val_ratio
     )
     utils.prints_stats(clean_data)
     clean_model = utils.get_model(
@@ -111,7 +98,13 @@ def train(load=False):
     clean_trainer = Trainer(clean_model, clean_data, optimizer, args)
     clean_trainer.train()
 
-    if args.attack_type != "trigger":
+    if args.attack_type == "metattack":
+        acc, _, f1 = clean_trainer.evaluate()
+        print(
+            f"==OG Model==\n Accuracy: {acc},  F1: {f1}"
+        )
+
+    elif args.attack_type != "trigger":
         acc, _, _ = clean_trainer.evaluate()
 
         forg, util, forget_f1, util_f1 = clean_trainer.get_score(
@@ -184,17 +177,6 @@ def poison(clean_data=None):
         )
 
         # print(poisoned_trainer.calculate_PSR())
-
-        # utils.plot_embeddings(
-        #     args,
-        #     poisoned_model,
-        #     poisoned_data,
-        #     class1=class_dataset_dict[args.dataset]["class1"],
-        #     class2=class_dataset_dict[args.dataset]["class2"],
-        #     is_dr=False,
-        #     name=f"poison_other",
-        # )
-
         return poisoned_data, poisoned_indices, poisoned_model
 
     print("==POISONING==")
@@ -225,6 +207,16 @@ def poison(clean_data=None):
             target_class=args.target_class,
             trigger_size=args.trigger_size,
         )
+    elif args.attack_type== "metattack":
+        poisoned_data, poisoned_indices = metattack(
+            clean_data,
+            args.df_size,
+            args.random_seed,
+        )
+        poisoned_data = poisoned_data.to(device)
+        poisoned_data.poisoned_indices = poisoned_indices
+        # save the poisoned data 
+        torch.save(poisoned_data, f"{args.data_dir}/{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}_poisoned_data.pt")
 
     poisoned_data = poisoned_data.to(device)
 
@@ -239,26 +231,34 @@ def poison(clean_data=None):
         poisoned_model, poisoned_data, optimizer, args
     )
     poisoned_trainer.train()
-    acc, _, _ = poisoned_trainer.evaluate()
-    forg, util, forget_f1, util_f1 = poisoned_trainer.get_score(
-        args.attack_type,
-        class1=class_dataset_dict[args.dataset]["class1"],
-        class2=class_dataset_dict[args.dataset]["class2"],
-    )
+    acc, _, f1 = poisoned_trainer.evaluate()
 
-    print(
-        f"==Poisoned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
-    )
-    logger.log_result(
-        args.random_seed,
-        "poisoned",
-        {
-            "forget": forg,
-            "utility": util,
-            "forget_f1": forget_f1,
-            "utility_f1": util_f1,
-        },
-    )
+    if args.attack_type == "metattack":
+        print(
+            f"==Poisoned Model==\n Accuracy: {acc},  F1: {f1}"
+        )
+
+    else:
+
+        forg, util, forget_f1, util_f1 = poisoned_trainer.get_score(
+            args.attack_type,
+            class1=class_dataset_dict[args.dataset]["class1"],
+            class2=class_dataset_dict[args.dataset]["class2"],
+        )
+
+        print(
+            f"==Poisoned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
+        )
+        logger.log_result(
+            args.random_seed,
+            "poisoned",
+            {
+                "forget": forg,
+                "utility": util,
+                "forget_f1": forget_f1,
+                "utility_f1": util_f1,
+            },
+        )
     # logger.log_result(args.random_seed, "poisoned", {"utility": acc})
     # print(f"PSR: {poisoned_trainer.calculate_PSR()}")
     return poisoned_data, poisoned_indices, poisoned_model
@@ -356,13 +356,12 @@ if __name__ == "__main__":
     print("\n\n\n")
 
     print(args.dataset, args.attack_type)
-    # clean_data = train(load=True)
-    clean_data = train()
-    
-    
-    poisoned_data, poisoned_indices, poisoned_model = poison()
-    # exit()
+    clean_data = train(load=False)
+    # clean_data = train()
 
+    poisoned_data, poisoned_indices, poisoned_model = poison(clean_data)
+
+    exit()
     # load best params file
     with open("best_params.json", "r") as f:
         d = json.load(f)
@@ -403,15 +402,6 @@ if __name__ == "__main__":
     #     class1=class_dataset_dict[args.dataset]["class1"],
     #     class2=class_dataset_dict[args.dataset]["class2"],
     #     is_dr=True,
-    #     name=f"{args.unlearning_model}",
+    #     name=f"unlearned_{args.unlearning_model}_2",
     # )
-
-    # utils.plot_embeddings(
-    #     args,
-    #     unlearnt_model,
-    #     poisoned_data,
-    #     class1=class_dataset_dict[args.dataset]["class1"],
-    #     class2=class_dataset_dict[args.dataset]["class2"],
-    #     is_dr=True,
-    #     name=f"{args.unlearning_model}_other",
-    # )
+    

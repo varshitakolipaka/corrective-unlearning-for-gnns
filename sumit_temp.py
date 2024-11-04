@@ -11,7 +11,7 @@ from trainers.base import Trainer
 from attacks.edge_attack import edge_attack_specific_nodes
 from attacks.label_flip import label_flip_attack
 from attacks.feature_attack import trigger_attack
-from attacks.meta_attack import meta_attack
+from attacks.meta_attack_ignore import meta_attack
 import optuna
 from optuna.samplers import TPESampler
 from functools import partial

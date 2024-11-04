@@ -1,0 +1,10 @@
+torch==2.3.0
+torch_geometric==2.5.3
+scikit-learn==1.4.2
+numpy==1.26.4
+matplotlib
+seaborn==0.13.2
+tqdm==4.66.4
+networkx==3.3
+ipdb==0.13.13
+pgmpy==0.1.26

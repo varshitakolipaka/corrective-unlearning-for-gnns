@@ -353,7 +353,7 @@ hp_tuning_params_dict = {
         # 'weight_decay': (1e-5, 1e-1, "log"),
     },
     "scrub_no_kl": {
-        "unlearn_iters": (110, 200, "int"),
+        "unlearn_iters": (10, 300, "int"),
         # 'kd_T': (1, 10, "float"),
         "unlearn_lr": (1e-5, 1e-1, "log"),
         # "scrubAlpha": (1e-6, 10, "log"),
@@ -361,19 +361,19 @@ hp_tuning_params_dict = {
         # 'weight_decay': (1e-5, 1e-1, "log"),
     },
     "scrub_no_kl_2": {
-        "unlearn_iters": (110, 300, "int"),
+        "unlearn_iters": (10, 300, "int"),
         # 'kd_T': (1, 10, "float"),
         "unlearn_lr": (1e-5, 1e-1, "log"),
         "scrubAlpha": (1e-6, 10, "log"),
-        "msteps": (10, 150, "int"),
+        # "msteps": (10, 150, "int"),
         # 'weight_decay': (1e-5, 1e-1, "log"),
     },
     "scrub_no_kl_combined": {
-        "unlearn_iters": (10, 50, "int"),
+        "unlearn_iters": (10, 300, "int"),
         # 'kd_T': (1, 10, "float"),
         "unlearn_lr": (1e-5, 1e-1, "log"),
         "scrubAlpha": (1e-6, 10, "log"),
-        "msteps": (1, 20, "int"),
+        # "msteps": (1, 20, "int"),
         # 'weight_decay': (1e-5, 1e-1, "log"),
     },
     "yaum": {
@@ -450,10 +450,6 @@ def objective(trial, model, data):
 if __name__ == "__main__":
     print("\n\n\n")
     print(args.dataset, args.attack_type)
-    if args.gnn == "gat":
-        args.train_lr = 0.06270178773628353
-        args.training_epochs = 1143
-        args.weight_decay = 0.00002
 
     clean_data = train(load=True)
     # clean_data = train()
