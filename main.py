@@ -18,6 +18,7 @@ from logger import Logger
 
 args = parse_args()
 
+#TOP K
 
 utils.seed_everything(args.random_seed)
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -270,7 +271,7 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
     utils.find_masks(
         poisoned_data, poisoned_indices, args, attack_type=args.attack_type
     )
-    
+
     if "gnndelete" in args.unlearning_model:
         unlearn_model = utils.get_model(
             args,
@@ -321,7 +322,7 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
         )
 
     _, _, time_taken = unlearn_trainer.train()
-    
+
     if args.linked:
         acc, _, _ = unlearn_trainer.evaluate(is_dr=False) # REAL
     else:
@@ -358,8 +359,8 @@ if __name__ == "__main__":
     print(args.dataset, args.attack_type)
     # clean_data = train(load=True)
     clean_data = train()
-    
-    
+
+
     poisoned_data, poisoned_indices, poisoned_model = poison()
     # exit()
 
@@ -374,7 +375,7 @@ if __name__ == "__main__":
         else:
             poisoned_indices = poisoned_data.poisoned_nodes
         print(f"No. of poisoned nodes: {len(poisoned_indices)}")
-        
+
         if args.attack_type == "edge":
             poisoned_indices, poisoned_nodes = utils.sample_poison_data_edges(poisoned_data, args.corrective_frac)
             poisoned_data.poisoned_edge_indices = poisoned_indices
