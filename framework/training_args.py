@@ -27,7 +27,7 @@ def parse_args():
     # Data
     parser.add_argument('--data_dir', type=str, default='./data', help='data dir')
     parser.add_argument('--db_name', type=str, default='hp_tuning', help='db name')
-    
+
     # parser.add_argument('--df', type=str, default='in', help='Df set to use')
     # parser.add_argument('--df_idx', type=str, default=None, help='indices of data to be deleted')
     parser.add_argument('--df_size', type=float, default=0.5, help='Forgetting Fraction')
@@ -93,7 +93,7 @@ def parse_args():
     parser.add_argument('--scrubAlpha', type=float, default=0, help='KL from og_model constant for SCRUB, higher incentivizes closeness to ogmodel')
     parser.add_argument('--msteps', type=int, default=25, help='Maximization steps on forget set for SCRUB')
     parser.add_argument('--ascent_lr', type=float, default=0.0025, help='Learning rate for gradient ascent steps')
-    parser.add_argument('--descent_lr', type=float, default=0.015, help='Learning rate for gradient descent steps')  
+    parser.add_argument('--descent_lr', type=float, default=0.015, help='Learning rate for gradient descent steps')
 
 
     # contrastive
@@ -107,24 +107,26 @@ def parse_args():
     parser.add_argument('--steps', type=int, default=10, help="steps of ascent and descent")
     parser.add_argument('--ascent_const', type=int, default=0.001, help="constant for ascent")
 
+    parser.add_argument('--k_frac', type=float, default=0.1, help="hardcoding the k for further analysis")
+
     # MEGU
     parser.add_argument('--kappa', type=float, default=0.01)
     parser.add_argument('--alpha1', type=float, default=0.8)
     parser.add_argument('--alpha2', type=float, default=0.5)
-    
+
     # SSD
     parser.add_argument('--SSDdampening', type=float, default=10, help='SSD: lambda aka dampening constant, lower leads to more forgetting')
     parser.add_argument('--SSDselectwt', type=float, default=1, help='SSD: alpha aka selection weight, lower leads to more forgetting')
-    
+
     # UTILITIES
     parser.add_argument('--embs_all', action='store_true', help='whether to plot embeddings in embs.py')
     parser.add_argument('--embs_unlearn', action='store_true', help='whether to plot embeddings in embs.py')
-    
+
     # CORRECTIVE UNLEARNING
     parser.add_argument('--corrective_frac', type=float, default=1, help='fraction of nodes to sample for corrective unlearning (by default all nodes)')
-    
+
     parser.add_argument('--log_name', type=str, default='default', help='log name')
-    
+
     parser.add_argument('--linked', action='store_true', help='whether to use linked model')
 
     args = parser.parse_args()

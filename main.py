@@ -357,6 +357,9 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
     print(
         f"==Unlearned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
     )
+    dictv= {"Forg_Accuracy":forg, "Util_Accuracy":util, "k_frac":args.k_frac}
+    with open("./report.txt", "a") as f:
+        f.write(f"{dictv}\n")
     logger.log_result(
         args.random_seed,
         args.unlearning_model,
@@ -377,9 +380,7 @@ if __name__ == "__main__":
 
     print(args.dataset, args.attack_type)
     clean_data = train(load=True)
-    # clean_data = train()
     poisoned_data, poisoned_indices, poisoned_model = poison()
-    exit(0)
 
     # load best params file
     with open("best_params.json", "r") as f:
@@ -406,7 +407,9 @@ if __name__ == "__main__":
         params = d[args.unlearning_model][args.experiment_name]
     except:
         params = {}
-    print(params)
+
+    params["contrastive_frac"] = args.k_frac
+    print(f"K% Value: {params['contrastive_frac']}")
 
     # set args
     for key, value in params.items():

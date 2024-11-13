@@ -1,0 +1,11 @@
+{'Forg_Accuracy': 0.61722571628232, 'Util_Accuracy': 0.5343745865489904, 'k_frac': 0.1}
+{'Forg_Accuracy': 0.61722571628232, 'Util_Accuracy': 0.5341302359059933, 'k_frac': 0.1}
+{'Forg_Accuracy': 0.61722571628232, 'Util_Accuracy': 0.5321655552061764, 'k_frac': 0.2}
+{'Forg_Accuracy': 0.5698812019566737, 'Util_Accuracy': 0.5255033518428984, 'k_frac': 0.3}
+{'Forg_Accuracy': 0.5793151642208245, 'Util_Accuracy': 0.5258077081729992, 'k_frac': 0.4}
+{'Forg_Accuracy': 0.5887491264849756, 'Util_Accuracy': 0.4961854952064706, 'k_frac': 0.5}
+{'Forg_Accuracy': 0.5600978336827394, 'Util_Accuracy': 0.490750604614998, 'k_frac': 0.6}
+{'Forg_Accuracy': 0.5410552061495457, 'Util_Accuracy': 0.4777733016913223, 'k_frac': 0.7}
+{'Forg_Accuracy': 0.5524109014675052, 'Util_Accuracy': 0.4572700164086231, 'k_frac': 0.8}
+{'Forg_Accuracy': 0.5524109014675052, 'Util_Accuracy': 0.45914032068822114, 'k_frac': 0.9}
+{'Forg_Accuracy': 0.3170859538784067, 'Util_Accuracy': 0.5497818290062053, 'k_frac': 1.0}
