@@ -138,6 +138,13 @@ def train(load=False):
         #     args.random_seed, "original", {"utility": acc}
         # )
 
+    os.makedirs(args.data_dir, exist_ok=True)
+    torch.save(
+        clean_model,
+        f"{args.data_dir}/{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_clean_model.pt",
+    )
+
+
     return clean_data
 
 
@@ -240,6 +247,18 @@ def poison(clean_data=None):
         poisoned_model, poisoned_data, optimizer, args
     )
     poisoned_trainer.train()
+
+    os.makedirs(args.data_dir, exist_ok=True)
+    torch.save(
+        poisoned_model,
+        f"{args.data_dir}/{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_poisoned_model.pt",
+    )
+
+    torch.save(
+        poisoned_data,
+        f"{args.data_dir}/{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_poisoned_data.pt",
+    )
+
     acc, _, _ = poisoned_trainer.evaluate()
     forg, util, forget_f1, util_f1 = poisoned_trainer.get_score(
         args.attack_type,
@@ -357,12 +376,10 @@ if __name__ == "__main__":
     print("\n\n\n")
 
     print(args.dataset, args.attack_type)
-    # clean_data = train(load=True)
-    clean_data = train()
-
-
+    clean_data = train(load=True)
+    # clean_data = train()
     poisoned_data, poisoned_indices, poisoned_model = poison()
-    # exit()
+    exit(0)
 
     # load best params file
     with open("best_params.json", "r") as f:
