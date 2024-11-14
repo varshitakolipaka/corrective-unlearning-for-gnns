@@ -581,6 +581,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         )
 
         # attacked idx must be a list of nodes
+        time_sum=0
         for epoch in trange(args.steps, desc="Unlearning"):
             self.save_best(inf=True)
             for i in range(args.contrastive_epochs_1 + args.contrastive_epochs_2):
@@ -631,13 +632,16 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
 
                 # save best model
                 self.unlearning_time += time.time() - iter_start_time
+                time_sum+= time.time() - iter_start_time
                 cutoff = self.save_best(is_dr=True,  inf=True)
+
                 if cutoff:
                     self.load_best()
                     return
 
         # load best model
         self.load_best()
+        return time_sum
 
     def train_edge(self):
         # attack idx must be a list of tuples (u,v)
@@ -738,4 +742,4 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         forg, util, forg_f1, util_f1 = self.get_score(self.args.attack_type, class1=class_dataset_dict[self.args.dataset]["class1"], class2=class_dataset_dict[self.args.dataset]["class2"])
         print(f"Forgotten: {forg}, Util: {util}, Forg F1: {forg_f1}, Util F1: {util_f1}")
 
-        return train_acc, msc_rate, self.best_model_time
+        return train_acc, msc_rate, self.unlearning_time

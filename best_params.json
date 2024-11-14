@@ -3290,6 +3290,16 @@
             "k_hop": 2,
             "ascent_lr": 3.392070287726541e-05,
             "descent_lr": 0.09689056179833237
+        },
+        "Cora_label_cacdc_gcn_1_rebuttal": {
+            "contrastive_epochs_1": 2,
+            "contrastive_epochs_2": 30,
+            "steps": 7,
+            "unlearn_lr": 0.013034338783160534,
+            "contrastive_frac": 0.06848825737272678,
+            "k_hop": 2,
+            "ascent_lr": 1.1479950746030373e-06,
+            "descent_lr": 0.016849113521346652
         }
     },
     "scrub_no_kl": {

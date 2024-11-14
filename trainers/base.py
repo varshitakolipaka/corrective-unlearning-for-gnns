@@ -67,7 +67,7 @@ class Trainer:
         self.best_model_time = 0
 
         self.TIME_THRESHOLD = 3 # 3 seconds
-        
+
         self.is_trigg_val = False
 
         self.class1 = class_dataset_dict[args.dataset]["class1"]
@@ -147,10 +147,10 @@ class Trainer:
 
         for poisoned_class in poisoned_classes:
             poisoned_indices = true_labels == poisoned_class
-            
+
             if poisoned_indices.sum() == 0:
                 continue
-            
+
             accs_poisoned.append(
                 accuracy_score(
                     true_labels[poisoned_indices].cpu(), pred_labels[poisoned_indices].cpu()
@@ -161,7 +161,7 @@ class Trainer:
             clean_indices = true_labels == clean_class
             if clean_indices.sum() == 0:
                 continue
-            
+
             accs_clean.append(
                 accuracy_score(
                     true_labels[clean_indices].cpu(), pred_labels[clean_indices].cpu()
@@ -171,7 +171,7 @@ class Trainer:
         # take average of the accs
         accs_poisoned = sum(accs_poisoned) / len(accs_poisoned)
         accs_clean = sum(accs_clean) / len(accs_clean)
-        
+
         # f1_poisoned = sum(f1_poisoned) / len(f1_poisoned)
         # f1_clean = sum(f1_clean) / len(f1_clean)
         f1_poisoned = 0
@@ -249,7 +249,7 @@ class Trainer:
         self.z = z
         self.pred = pred[mask]
         self.true = self.data.y[mask].cpu()
-        
+
         self.is_trigg_val = use_val
 
         return acc, -1, f1
@@ -266,12 +266,12 @@ class Trainer:
             mask = self.data.poison_test_mask
             util_mask = self.data.clean_test_mask
         pred = torch.argmax(z[mask], dim=1).cpu()
-        
+
         if self.is_trigg_val:
             forg = 1 - accuracy_score(self.data.y[mask].cpu(), pred)
         else:
             forg = accuracy_score(self.data.y[mask].cpu(), pred)
-        
+
         pred_clean = torch.argmax(z[util_mask], dim=1).cpu()
         util = accuracy_score(self.data.y[util_mask].cpu(), pred_clean)
         return forg, util
@@ -318,6 +318,7 @@ class Trainer:
         return score
 
     def save_best(self, is_dr=True, inf=False):
+        # inf = False
         curr_time = time.time()
         score = self.validate(is_dr)
         if not inf:

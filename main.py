@@ -357,7 +357,7 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
     print(
         f"==Unlearned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
     )
-    dictv= {"Forg_Accuracy":forg, "Util_Accuracy":util, "k_frac":args.k_frac, "count": args.counter}
+    dictv= {"Forg_Accuracy":forg, "Util_Accuracy":util, "k_frac":args.k_frac, "count": args.counter, "time": time_taken}
     with open("./report.txt", "a") as f:
         f.write(f"{dictv}\n")
     logger.log_result(
