@@ -560,3 +560,46 @@ def get_closest_classes(classes, counts):
     pairwise_diffs = sorted(pairwise_diffs, key=lambda x: x[2])
 
     return pairwise_diffs
+
+def plot_convergence(losses, loss_component, save_path_contrastive="contrastive_plot.png", save_path_ascent="ascent_plot.png", save_path_descent="descent_plot.png"):
+    colors = {'contrastive': 'green', 'ascent': 'red', 'descent': 'blue'}
+
+    # Separate losses based on components
+    contrastive_losses = [loss.detach().cpu().numpy() if hasattr(loss, 'detach') else loss 
+                          for loss, component in zip(losses, loss_component) if component == 'contrastive']
+    ascent_losses = [loss.detach().cpu().numpy() if hasattr(loss, 'detach') else loss 
+                     for loss, component in zip(losses, loss_component) if component == 'ascent']
+    descent_losses = [loss.detach().cpu().numpy() if hasattr(loss, 'detach') else loss 
+                      for loss, component in zip(losses, loss_component) if component == 'descent']
+    
+    # Define the x-axis as "epoch indices"
+    epoch_indices_contrastive = [i / 3 for i in range(len(contrastive_losses))]
+    epoch_indices_ascent = [i / 3 for i in range(len(ascent_losses))]
+    epoch_indices_descent = [i / 3 for i in range(len(descent_losses))]
+
+    # Plot for contrastive losses
+    plt.figure(figsize=(10, 6))
+    plt.plot(epoch_indices_contrastive, contrastive_losses, marker='o', color=colors['contrastive'])
+    plt.xlabel("Epoch")
+    plt.ylabel("Contrastive Loss")
+    plt.title("Contrastive Loss Convergence per Epoch")
+    plt.savefig(save_path_contrastive)
+    plt.close()
+
+    # Plot for ascent losses
+    plt.figure(figsize=(10, 6))
+    plt.plot(epoch_indices_ascent, ascent_losses, marker='o', color=colors['ascent'])
+    plt.xlabel("Epoch")
+    plt.ylabel("Ascent Loss")
+    plt.title("Ascent Loss Convergence per Epoch")
+    plt.savefig(save_path_ascent)
+    plt.close()
+
+    # Plot for descent losses
+    plt.figure(figsize=(10, 6))
+    plt.plot(epoch_indices_descent, descent_losses, marker='o', color=colors['descent'])
+    plt.xlabel("Epoch")
+    plt.ylabel("Descent Loss")
+    plt.title("Descent Loss Convergence per Epoch")
+    plt.savefig(save_path_descent)
+    plt.close()

@@ -86,6 +86,9 @@ class Trainer:
         self.poison_test_mask = self.poison_test_mask_class1 | self.poison_test_mask_class2
         self.clean_test_mask = ~self.poison_test_mask & self.data.test_mask
 
+        self.losses = []
+        self.loss_component = []
+
     def train(self):
         losses = []
         self.data = self.data.to(device)
@@ -343,3 +346,11 @@ class Trainer:
         except:
             print("Model state file not found.")
         return self.best_val_score
+    
+    def log_loss_info(self, loss, attribute):
+        self.losses.append(loss)
+        if attribute in ['contrastive', 'ascent', 'descent']: 
+            self.loss_component.append(attribute)
+        else:
+            raise Exception("invalid: should be either contrastive or acdc")
+        

@@ -349,6 +349,9 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
         },
     )
     print("==UNLEARNING DONE==")
+    print("hiiiiiiiiiii")
+    utils.plot_convergence(unlearn_trainer.losses, unlearn_trainer.loss_component)
+
     return unlearn_model
 
 

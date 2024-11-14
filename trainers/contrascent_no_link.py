@@ -593,6 +593,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     #     pos_dist, neg_dist, margin=args.contrastive_margin
                     # )
                     loss = self.run_sage_batch()
+                    self.log_loss_info(loss, 'contrastive')
 
                     loss.backward()
                     optimizer.step()
@@ -600,6 +601,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     ascent_optimizer.zero_grad()
 
                     ascent_loss = self.ascent_loss(self.data.poison_mask)
+                    self.log_loss_info(ascent_loss, 'ascent')
 
                     ascent_loss.backward()
                     ascent_optimizer.step()
@@ -620,6 +622,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     )
                     # kd_loss = self.kd_loss()
                     descent_loss = finetune_loss
+                    self.log_loss_info(ascent_loss, 'descent')
 
                     descent_loss.backward()
                     descent_optimizer.step()
