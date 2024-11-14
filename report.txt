@@ -1,11 +1,40 @@
-{'Forg_Accuracy': 0.61722571628232, 'Util_Accuracy': 0.5343745865489904, 'k_frac': 0.1}
-{'Forg_Accuracy': 0.61722571628232, 'Util_Accuracy': 0.5341302359059933, 'k_frac': 0.1}
-{'Forg_Accuracy': 0.61722571628232, 'Util_Accuracy': 0.5321655552061764, 'k_frac': 0.2}
-{'Forg_Accuracy': 0.5698812019566737, 'Util_Accuracy': 0.5255033518428984, 'k_frac': 0.3}
-{'Forg_Accuracy': 0.5793151642208245, 'Util_Accuracy': 0.5258077081729992, 'k_frac': 0.4}
-{'Forg_Accuracy': 0.5887491264849756, 'Util_Accuracy': 0.4961854952064706, 'k_frac': 0.5}
-{'Forg_Accuracy': 0.5600978336827394, 'Util_Accuracy': 0.490750604614998, 'k_frac': 0.6}
-{'Forg_Accuracy': 0.5410552061495457, 'Util_Accuracy': 0.4777733016913223, 'k_frac': 0.7}
-{'Forg_Accuracy': 0.5524109014675052, 'Util_Accuracy': 0.4572700164086231, 'k_frac': 0.8}
-{'Forg_Accuracy': 0.5524109014675052, 'Util_Accuracy': 0.45914032068822114, 'k_frac': 0.9}
-{'Forg_Accuracy': 0.3170859538784067, 'Util_Accuracy': 0.5497818290062053, 'k_frac': 1.0}
+{'Forg_Accuracy': 0.5527603074772885, 'Util_Accuracy': 0.5639469673164733, 'k_frac': 0.001, 'count': 0}
+{'Forg_Accuracy': 0.6182739343116702, 'Util_Accuracy': 0.5836347855654745, 'k_frac': 0.002, 'count': 0}
+{'Forg_Accuracy': 0.6554856743535988, 'Util_Accuracy': 0.5613806265065289, 'k_frac': 0.008, 'count': 0}
+{'Forg_Accuracy': 0.6275331935709294, 'Util_Accuracy': 0.577951116495548, 'k_frac': 0.01, 'count': 0}
+{'Forg_Accuracy': 0.6464011180992313, 'Util_Accuracy': 0.5510465108277409, 'k_frac': 0.015, 'count': 0}
+{'Forg_Accuracy': 0.6462264150943396, 'Util_Accuracy': 0.5552217483722676, 'k_frac': 0.02, 'count': 0}
+{'Forg_Accuracy': 0.6369671558350803, 'Util_Accuracy': 0.5541949147227493, 'k_frac': 0.025, 'count': 0}
+{'Forg_Accuracy': 0.6462264150943396, 'Util_Accuracy': 0.5641259991926902, 'k_frac': 0.03, 'count': 0}
+{'Forg_Accuracy': 0.6090146750524109, 'Util_Accuracy': 0.5660891958726646, 'k_frac': 0.001, 'count': 1}
+{'Forg_Accuracy': 0.6464011180992313, 'Util_Accuracy': 0.5553664686121397, 'k_frac': 0.002, 'count': 1}
+{'Forg_Accuracy': 0.59958071278826, 'Util_Accuracy': 0.5805213743190444, 'k_frac': 0.008, 'count': 1}
+{'Forg_Accuracy': 0.6649196366177499, 'Util_Accuracy': 0.5649976191568777, 'k_frac': 0.01, 'count': 1}
+{'Forg_Accuracy': 0.6462264150943396, 'Util_Accuracy': 0.5611826485394988, 'k_frac': 0.015, 'count': 1}
+{'Forg_Accuracy': 0.6556603773584906, 'Util_Accuracy': 0.5578031140127707, 'k_frac': 0.02, 'count': 1}
+{'Forg_Accuracy': 0.646051712089448, 'Util_Accuracy': 0.5448744984079222, 'k_frac': 0.025, 'count': 1}
+{'Forg_Accuracy': 0.6745283018867925, 'Util_Accuracy': 0.5470704060475213, 'k_frac': 0.03, 'count': 1}
+{'Forg_Accuracy': 0.5997554157931517, 'Util_Accuracy': 0.5390633391367652, 'k_frac': 0.001, 'count': 2}
+{'Forg_Accuracy': 0.5903214535290007, 'Util_Accuracy': 0.5780860569730008, 'k_frac': 0.002, 'count': 2}
+{'Forg_Accuracy': 0.6275331935709294, 'Util_Accuracy': 0.5549251201475599, 'k_frac': 0.008, 'count': 2}
+{'Forg_Accuracy': 0.646051712089448, 'Util_Accuracy': 0.5514773517335212, 'k_frac': 0.01, 'count': 2}
+{'Forg_Accuracy': 0.6462264150943396, 'Util_Accuracy': 0.5632888526176976, 'k_frac': 0.015, 'count': 2}
+{'Forg_Accuracy': 0.6462264150943396, 'Util_Accuracy': 0.5608822304376018, 'k_frac': 0.02, 'count': 2}
+{'Forg_Accuracy': 0.6462264150943396, 'Util_Accuracy': 0.5578489724461958, 'k_frac': 0.025, 'count': 2}
+{'Forg_Accuracy': 0.6369671558350803, 'Util_Accuracy': 0.5693429898896184, 'k_frac': 0.03, 'count': 2}
+{'Forg_Accuracy': 0.5620195667365478, 'Util_Accuracy': 0.5852285036514183, 'k_frac': 0.001, 'count': 3}
+{'Forg_Accuracy': 0.5808874912648497, 'Util_Accuracy': 0.5571516577951989, 'k_frac': 0.002, 'count': 3}
+{'Forg_Accuracy': 0.5899720475192173, 'Util_Accuracy': 0.545273254958439, 'k_frac': 0.008, 'count': 3}
+{'Forg_Accuracy': 0.6738294898672257, 'Util_Accuracy': 0.5815897868997922, 'k_frac': 0.01, 'count': 3}
+{'Forg_Accuracy': 0.6369671558350803, 'Util_Accuracy': 0.557683175813228, 'k_frac': 0.015, 'count': 3}
+{'Forg_Accuracy': 0.6556603773584906, 'Util_Accuracy': 0.561599269587466, 'k_frac': 0.02, 'count': 3}
+{'Forg_Accuracy': 0.6182739343116702, 'Util_Accuracy': 0.5550694325988641, 'k_frac': 0.025, 'count': 3}
+{'Forg_Accuracy': 0.6367924528301887, 'Util_Accuracy': 0.5656140083067239, 'k_frac': 0.03, 'count': 3}
+{'Forg_Accuracy': 0.5994060097833682, 'Util_Accuracy': 0.5833344827611397, 'k_frac': 0.001, 'count': 4}
+{'Forg_Accuracy': 0.6275331935709294, 'Util_Accuracy': 0.5849219298247286, 'k_frac': 0.002, 'count': 4}
+{'Forg_Accuracy': 0.6367924528301887, 'Util_Accuracy': 0.5669332443724635, 'k_frac': 0.008, 'count': 4}
+{'Forg_Accuracy': 0.636617749825297, 'Util_Accuracy': 0.5549089109875788, 'k_frac': 0.01, 'count': 4}
+{'Forg_Accuracy': 0.6553109713487073, 'Util_Accuracy': 0.5704897515993651, 'k_frac': 0.015, 'count': 4}
+{'Forg_Accuracy': 0.6738294898672257, 'Util_Accuracy': 0.5738494265472329, 'k_frac': 0.02, 'count': 4}
+{'Forg_Accuracy': 0.6554856743535988, 'Util_Accuracy': 0.5641893248583425, 'k_frac': 0.025, 'count': 4}
+{'Forg_Accuracy': 0.6369671558350803, 'Util_Accuracy': 0.5488279311086085, 'k_frac': 0.03, 'count': 4}

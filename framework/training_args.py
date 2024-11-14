@@ -108,7 +108,7 @@ def parse_args():
     parser.add_argument('--ascent_const', type=int, default=0.001, help="constant for ascent")
 
     parser.add_argument('--k_frac', type=float, default=0.1, help="hardcoding the k for further analysis")
-
+    parser.add_argument('--counter', type=int, default=0)
     # MEGU
     parser.add_argument('--kappa', type=float, default=0.01)
     parser.add_argument('--alpha1', type=float, default=0.8)
