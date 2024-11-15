@@ -189,11 +189,11 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         influence_nodes_with_unlearning_nodes = indices
         print(influence_nodes_with_unlearning_nodes)
 
-        with open("./affected_indices.pkl", "rb") as f:
-            dictv= pickle.load(f)
-        dictv[self.args.training_epochs] = influence_nodes_with_unlearning_nodes.cpu().detach().numpy()
-        with open("./affected_indices.pkl", "wb") as f:
-            pickle.dump(dictv, f)
+        # with open("./affected_indices.pkl", "rb") as f:
+        #     dictv= pickle.load(f)
+        # dictv[self.args.training_epochs] = influence_nodes_with_unlearning_nodes.cpu().detach().numpy()
+        # with open("./affected_indices.pkl", "wb") as f:
+        #     pickle.dump(dictv, f)
 
         print(f"Nodes influenced: {len(influence_nodes_with_unlearning_nodes)}")
 
