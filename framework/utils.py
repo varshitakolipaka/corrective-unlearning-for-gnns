@@ -165,37 +165,50 @@ def get_sdf_masks(data, args):
     data.train_pos_edge_index = data.edge_index
     data.sdf_mask = three_hop_mask
 
+def find_masks(data, poisoned_indices, split_idx, args, attack_type="label"):
+    """
+    Find data masks (df_mask and dr_mask) for OGB datasets, specifically for the 'ogbn-arxiv' dataset.
+    """
+    
+    # Check for label, random, or trigger attack type
+    if attack_type in ["label", "random", "trigger"]:
+        
+        # Initialize node masks if specific unlearning models are used
+        if any(model in args.unlearning_model for model in ["scrub", "grub", "yaum", "ssd"]) or \
+           ("megu" in args.unlearning_model and "node" in args.request):
+            data.node_df_mask = torch.zeros(data.num_nodes, dtype=torch.bool, device=data.y.device)
+            data.node_dr_mask = torch.zeros(data.num_nodes, dtype=torch.bool, device=data.y.device)
 
-def find_masks(data, poisoned_indices, args, attack_type="label"):
-
-    if attack_type == "label" or attack_type == "random"  or attack_type == "trigger":
-
-        if "scrub" in args.unlearning_model or "grub" in args.unlearning_model or "yaum" in args.unlearning_model or "ssd" in args.unlearning_model or ("megu" in args.unlearning_model and "node" in args.request):
-            data.node_df_mask = torch.zeros(data.num_nodes, dtype=torch.bool)  # of size num nodes
-            data.node_dr_mask = data.train_mask
+            # Only nodes in the training split are considered for data removal
+            data.node_dr_mask[split_idx['train']] = True
             data.node_df_mask[poisoned_indices] = True
             data.node_dr_mask[poisoned_indices] = False
 
-        data.df_mask = torch.zeros(data.edge_index.shape[1], dtype=torch.bool)
-        data.dr_mask = torch.zeros(data.edge_index.shape[1], dtype=torch.bool)
+        # Initialize df_mask and dr_mask for edges
+        data.df_mask = torch.zeros(data.adj_t.nnz(), dtype=torch.bool, device=data.y.device)
+        data.dr_mask = torch.zeros(data.adj_t.nnz(), dtype=torch.bool, device=data.y.device)
+
+        # Convert sparse adjacency matrix to edge_index format for mask generation
+        data.edge_index = data.adj_t.cpu().to_dense().nonzero(as_tuple=False).t()
+
         for node in poisoned_indices:
-            data.train_mask[node] = False
-            node_tensor = torch.tensor([node], dtype=torch.long)
+            # Get 1-hop neighbors and local edges for the poisoned node
+            node_tensor = torch.tensor([node], dtype=torch.long, device=data.y.device)
             _, local_edges, _, mask = k_hop_subgraph(
                 node_tensor, 1, data.edge_index, num_nodes=data.num_nodes
             )
+
+            # Mark these edges in df_mask
             data.df_mask[mask] = True
+
+        # Complementary mask for the remaining edges
         data.dr_mask = ~data.df_mask
 
-    elif attack_type == "edge":
-        data.df_mask = torch.zeros(data.edge_index.shape[1], dtype=torch.bool)
-        data.dr_mask = torch.zeros(data.edge_index.shape[1], dtype=torch.bool)
-        data.df_mask[poisoned_indices] = 1
-        data.dr_mask = ~data.df_mask
     data.attacked_idx = torch.tensor(poisoned_indices, dtype=torch.long)
-    if not ("scrub" in args.unlearning_model) and not ("megu" in args.unlearning_model):
-        get_sdf_masks(data, args)
+    # if not ("scrub" in args.unlearning_model) and not ("megu" in args.unlearning_model):
+    #     get_sdf_masks(data, args)
 
+    return data
 
 def get_trainer(args, poisoned_model, poisoned_data, optimizer_unlearn) -> Trainer:
 
@@ -262,6 +275,24 @@ def prints_stats(data):
     for i in range(data.num_classes):
         counts[i] = (data.y == i).sum().item()
     for i in range(data.num_classes):
+        print(f"Number of nodes in class {i}: {counts[i]}")
+
+def prints_stats_ogb(data, split_idx, num_classes):
+    # Print general stats of the dataset
+    print("Number of nodes: ", data.num_nodes)
+    print("Number of edges: ", data.num_edges)
+    print("Number of features: ", data.num_features)
+    print("Number of classes: ", num_classes)
+    print("Number of training nodes: ", split_idx['train'].shape[0])
+    print("Number of validation nodes: ", split_idx['valid'].shape[0])
+    print("Number of testing nodes: ", split_idx['test'].shape[0])
+
+    # Get counts of each class
+    counts = [0] * num_classes
+    for i in range(num_classes):
+        counts[i] = (data.y == i).sum().item()
+    
+    for i in range(num_classes):
         print(f"Number of nodes in class {i}: {counts[i]}")
 
 def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test", name=""):

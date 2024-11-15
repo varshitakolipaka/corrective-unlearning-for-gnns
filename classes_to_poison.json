@@ -20,5 +20,9 @@
     "Computers": {
         "class1": 0,
         "class2": 6
+    },
+    "ogbn-arxiv": {
+        "class1": 4,
+        "class2": 26
     }
 }

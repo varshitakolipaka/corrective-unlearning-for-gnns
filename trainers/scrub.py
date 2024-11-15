@@ -152,6 +152,8 @@ class ScrubTrainer(Trainer):
 
         with torch.no_grad():
             logit_t = self.og_model(data.x, data.edge_index)
+            
+        print(output[mask].shape, data.y[mask].shape)
 
         loss = F.cross_entropy(output[mask], data.y[mask])
         loss += self.opt.scrubAlpha * distill_kl_loss(output[mask], logit_t[mask], self.opt.kd_T)

@@ -66,7 +66,7 @@ class Trainer:
         self.unlearning_time = 0
         self.best_model_time = 0
 
-        self.TIME_THRESHOLD = 3 # 3 seconds
+        self.TIME_THRESHOLD = 20 # 3 seconds
         
         self.is_trigg_val = False
 
@@ -78,13 +78,22 @@ class Trainer:
         for i in range(self.data.num_classes):
             if i not in self.poisoned_classes:
                 self.clean_classes.append(i)
-
+        
+        # put all masks on cpu
+        self.data.train_mask = self.data.train_mask.cpu()
+        self.data.val_mask = self.data.val_mask.cpu()
+        self.data.test_mask = self.data.test_mask.cpu()
+        
+        self.data.poisoned_nodes = self.data.poisoned_nodes.cpu()
+        self.data.y = self.data.y.cpu()
+            
         # create a mask for the poisoned class nodes in test set
         self.poison_test_mask_class1 = self.data.y == self.class1 & self.data.test_mask
         self.poison_test_mask_class2 = self.data.y == self.class2 & self.data.test_mask
 
         self.poison_test_mask = self.poison_test_mask_class1 | self.poison_test_mask_class2
         self.clean_test_mask = ~self.poison_test_mask & self.data.test_mask
+        
 
     def train(self):
         losses = []
