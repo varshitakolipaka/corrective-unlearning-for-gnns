@@ -3,6 +3,7 @@ import copy
 from pprint import pprint
 import time
 import scipy.sparse as sp
+import pickle
 
 # import wandb
 import numpy as np
@@ -188,6 +189,13 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         _, indices = torch.topk(diff, int(frac * len(subset)), largest=True)
 
         influence_nodes_with_unlearning_nodes = indices
+        print(influence_nodes_with_unlearning_nodes)
+
+        # with open("./affected_indices.pkl", "rb") as f:
+        #     dictv= pickle.load(f)
+        # dictv[self.args.training_epochs] = influence_nodes_with_unlearning_nodes.cpu().detach().numpy()
+        # with open("./affected_indices.pkl", "wb") as f:
+        #     pickle.dump(dictv, f)
 
         print(f"Nodes influenced: {len(influence_nodes_with_unlearning_nodes)}")
         with open("./file.txt", "a") as f:

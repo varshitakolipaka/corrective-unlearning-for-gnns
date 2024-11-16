@@ -15,6 +15,7 @@ import optuna
 from optuna.samplers import TPESampler
 from functools import partial
 from logger import Logger
+import pickle
 
 args = parse_args()
 
@@ -124,6 +125,17 @@ def train(load=False):
         print(
             f"==OG Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
         )
+
+        with open("./performance_scores.pkl", "rb") as f:
+            dictv= pickle.load(f)
+        if args.training_epochs not in dictv:
+            print("lol")
+            dictv[args.training_epochs] = {}
+        dictv[args.training_epochs]["og_forg"] = forg
+        dictv[args.training_epochs]["og_util"] = util
+        with open("./performance_scores.pkl", "wb") as f:
+            pickle.dump(dictv, f)
+
         logger.log_result(
             args.random_seed,
             "original",
@@ -269,6 +281,17 @@ def poison(clean_data=None):
     print(
         f"==Poisoned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
     )
+
+    with open("./performance_scores.pkl", "rb") as f:
+        dictv= pickle.load(f)
+    if args.training_epochs not in dictv:
+        print("lol")
+        dictv[args.training_epochs] = {}
+    dictv[args.training_epochs]["poison_forg"] = forg
+    dictv[args.training_epochs]["poison_util"] = util
+    with open("./performance_scores.pkl", "wb") as f:
+        pickle.dump(dictv, f)
+
     logger.log_result(
         args.random_seed,
         "poisoned",
@@ -357,9 +380,16 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
     print(
         f"==Unlearned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
     )
-    dictv= {"Forg_Accuracy":forg, "Util_Accuracy":util, "k_frac":args.k_frac, "count": args.counter, "time": time_taken}
-    with open("./report.txt", "a") as f:
-        f.write(f"{dictv}\n")
+    with open("./performance_scores.pkl", "rb") as f:
+        dictv= pickle.load(f)
+    if args.training_epochs not in dictv:
+        print("lol")
+        dictv[args.training_epochs] = {}
+    dictv[args.training_epochs]["unlearn_forg"] = forg
+    dictv[args.training_epochs]["unlearn_util"] = util
+    with open("./performance_scores.pkl", "wb") as f:
+        pickle.dump(dictv, f)
+
     logger.log_result(
         args.random_seed,
         args.unlearning_model,
@@ -379,8 +409,12 @@ if __name__ == "__main__":
     print("\n\n\n")
 
     print(args.dataset, args.attack_type)
-    clean_data = train(load=True)
+    # clean_data = train(load=True)
+    clean_data = train()
+
+
     poisoned_data, poisoned_indices, poisoned_model = poison()
+    # exit()
 
     # load best params file
     with open("best_params.json", "r") as f:
