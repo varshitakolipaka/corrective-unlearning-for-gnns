@@ -318,7 +318,8 @@ class Trainer:
         return score
 
     def save_best(self, is_dr=True, inf=False):
-        # inf = False
+        if self.args.frac_test:
+            inf = True
         curr_time = time.time()
         score = self.validate(is_dr)
         if not inf:

@@ -177,14 +177,8 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         )
 
         diff = torch.abs(og_logits - final_logits)
-
-        # average across all classes
         diff = torch.mean(diff, dim=1)
-
-        # take diffs of only the subset without the attacked nodes
         diff = diff[subset]
-
-        #  get the top 10% of the indices
         frac = self.args.contrastive_frac
         _, indices = torch.topk(diff, int(frac * len(subset)), largest=True)
 
@@ -641,7 +635,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                 # save best model
                 self.unlearning_time += time.time() - iter_start_time
                 time_sum+= time.time() - iter_start_time
-                cutoff = self.save_best(is_dr=True,  inf=True)
+                cutoff = self.save_best(is_dr=True)
 
                 if cutoff:
                     self.load_best()
@@ -717,9 +711,9 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                 # save best model
                 if i % 2 == 0:
                     if self.args.linked:
-                        cutoff = self.save_best(is_dr=False, inf=True)
+                        cutoff = self.save_best(is_dr=False)
                     else:
-                        cutoff = self.save_best(inf=True)
+                        cutoff = self.save_best()
                         if cutoff:
                             break
 

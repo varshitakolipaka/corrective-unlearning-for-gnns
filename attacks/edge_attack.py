@@ -54,10 +54,10 @@ def edge_attack_specific_nodes(data, epsilon, seed, class1=None, class2=None):
     train_indices = data.train_mask.nonzero(as_tuple=False).view(-1)
     train_labels, counts = torch.unique(data.y[train_indices], return_counts=True)
     sorted_indices = torch.argsort(counts, descending=True)
-    
+
     if class1 is None or class2 is None:
         class1, class2 = get_closest_classes(train_labels, counts)
-        
+
     class1_indices = train_indices[data.y[train_indices] == class1]
     class2_indices = train_indices[data.y[train_indices] == class2]
 
@@ -100,14 +100,14 @@ def edge_attack_specific_nodes(data, epsilon, seed, class1=None, class2=None):
     edge_index_to_add = edge_index_to_add.clone().detach().to(device)
 
     data.poisoned_nodes= torch.tensor(list(poisoned_nodes), dtype=torch.long)
-    
+
     data.poison_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
     data.poison_mask[list(poisoned_nodes)] = True
-    
+
     augmented_edge = torch.cat([data.edge_index.to(device), edge_index_to_add], dim=1)
     data.edge_index = augmented_edge
     nums= list(range(len(data.edge_index[0])-2*len(poisoned_edges), len(data.edge_index[0])))
-    
+
     data.poisoned_edge_indices = torch.tensor(nums, dtype=torch.long)
-    
+
     return data, torch.tensor(nums, dtype=torch.long)

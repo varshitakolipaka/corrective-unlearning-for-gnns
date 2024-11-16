@@ -126,15 +126,15 @@ def train(load=False):
             f"==OG Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
         )
 
-        with open("./performance_scores.pkl", "rb") as f:
-            dictv= pickle.load(f)
-        if args.training_epochs not in dictv:
-            print("lol")
-            dictv[args.training_epochs] = {}
-        dictv[args.training_epochs]["og_forg"] = forg
-        dictv[args.training_epochs]["og_util"] = util
-        with open("./performance_scores.pkl", "wb") as f:
-            pickle.dump(dictv, f)
+        # with open("./performance_scores.pkl", "rb") as f:
+        #     dictv= pickle.load(f)
+        # if args.training_epochs not in dictv:
+        #     print("lol")
+        #     dictv[args.training_epochs] = {}
+        # dictv[args.training_epochs]["og_forg"] = forg
+        # dictv[args.training_epochs]["og_util"] = util
+        # with open("./performance_scores.pkl", "wb") as f:
+        #     pickle.dump(dictv, f)
 
         logger.log_result(
             args.random_seed,
@@ -192,6 +192,8 @@ def poison(clean_data=None):
         print(
             f"==Poisoned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
         )
+
+
         logger.log_result(
             args.random_seed,
             "poisoned",
@@ -228,7 +230,8 @@ def poison(clean_data=None):
         )
     elif args.attack_type == "edge":
         poisoned_data, poisoned_indices = edge_attack_specific_nodes(
-            clean_data, args.df_size, args.random_seed
+            clean_data, args.df_size, args.random_seed, class_dataset_dict[args.dataset]["class1"],
+            class_dataset_dict[args.dataset]["class2"],
         )
     elif args.attack_type == "random":
         poisoned_data = copy.deepcopy(clean_data)
@@ -282,15 +285,15 @@ def poison(clean_data=None):
         f"==Poisoned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
     )
 
-    with open("./performance_scores.pkl", "rb") as f:
-        dictv= pickle.load(f)
-    if args.training_epochs not in dictv:
-        print("lol")
-        dictv[args.training_epochs] = {}
-    dictv[args.training_epochs]["poison_forg"] = forg
-    dictv[args.training_epochs]["poison_util"] = util
-    with open("./performance_scores.pkl", "wb") as f:
-        pickle.dump(dictv, f)
+    # with open("./performance_scores.pkl", "rb") as f:
+    #     dictv= pickle.load(f)
+    # if args.training_epochs not in dictv:
+    #     print("lol")
+    #     dictv[args.training_epochs] = {}
+    # dictv[args.training_epochs]["poison_forg"] = forg
+    # dictv[args.training_epochs]["poison_util"] = util
+    # with open("./performance_scores.pkl", "wb") as f:
+    #     pickle.dump(dictv, f)
 
     logger.log_result(
         args.random_seed,
@@ -356,7 +359,7 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
         unlearn_model = utils.get_model(
             args, poisoned_data.num_features, args.hidden_dim, poisoned_data.num_classes
         )
-        # copy the weights from the poisoned model
+
         unlearn_model.load_state_dict(poisoned_model.state_dict())
         optimizer_unlearn = utils.get_optimizer(args, unlearn_model)
         unlearn_trainer = utils.get_trainer(
@@ -369,8 +372,7 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
         acc, _, _ = unlearn_trainer.evaluate(is_dr=False) # REAL
     else:
         acc, _, _ = unlearn_trainer.evaluate(is_dr=True) # REAL
-    # acc, _, _ = unlearn_trainer.evaluate(is_dr=False)  # TEST
-    print(acc)
+
     forg, util, forget_f1, util_f1 = unlearn_trainer.get_score(
         args.attack_type,
         class1=class_dataset_dict[args.dataset]["class1"],
@@ -380,15 +382,21 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
     print(
         f"==Unlearned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
     )
-    with open("./performance_scores.pkl", "rb") as f:
-        dictv= pickle.load(f)
-    if args.training_epochs not in dictv:
-        print("lol")
-        dictv[args.training_epochs] = {}
-    dictv[args.training_epochs]["unlearn_forg"] = forg
-    dictv[args.training_epochs]["unlearn_util"] = util
-    with open("./performance_scores.pkl", "wb") as f:
-        pickle.dump(dictv, f)
+    if args.frac_test:
+        dictv= {"k_frac":args.k_frac, "forg_val":forg, "util_val":util, "time_taken": unlearn_trainer.unlearning_time}
+        filename = args.frac_test_filename
+        with open(filename, "a") as f:
+            f.write(f"{dictv}\n")
+
+    # with open("./performance_scores.pkl", "rb") as f:
+    #     dictv= pickle.load(f)
+    # if args.training_epochs not in dictv:
+    #     print("lol")
+    #     dictv[args.training_epochs] = {}
+    # dictv[args.training_epochs]["unlearn_forg"] = forg
+    # dictv[args.training_epochs]["unlearn_util"] = util
+    # with open("./performance_scores.pkl", "wb") as f:
+    #     pickle.dump(dictv, f)
 
     logger.log_result(
         args.random_seed,
@@ -406,17 +414,10 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
 
 
 if __name__ == "__main__":
-    print("\n\n\n")
-
     print(args.dataset, args.attack_type)
-    # clean_data = train(load=True)
-    clean_data = train()
-
-
+    clean_data = train(load=True)
     poisoned_data, poisoned_indices, poisoned_model = poison()
-    # exit()
 
-    # load best params file
     with open("best_params.json", "r") as f:
         d = json.load(f)
 
@@ -442,31 +443,11 @@ if __name__ == "__main__":
     except:
         params = {}
 
-    params["contrastive_frac"] = args.k_frac
-    print(f"K% Value: {params['contrastive_frac']}")
+    if args.frac_test:
+        params["contrastive_frac"] = args.k_frac
+        print(f"K% Value: {params['contrastive_frac']}")
 
-    # set args
     for key, value in params.items():
         setattr(args, key, value)
 
     unlearnt_model = unlearn(poisoned_data, poisoned_indices, poisoned_model)
-
-    # utils.plot_embeddings(
-    #     args,
-    #     unlearnt_model,
-    #     poisoned_data,
-    #     class1=class_dataset_dict[args.dataset]["class1"],
-    #     class2=class_dataset_dict[args.dataset]["class2"],
-    #     is_dr=True,
-    #     name=f"{args.unlearning_model}",
-    # )
-
-    # utils.plot_embeddings(
-    #     args,
-    #     unlearnt_model,
-    #     poisoned_data,
-    #     class1=class_dataset_dict[args.dataset]["class1"],
-    #     class2=class_dataset_dict[args.dataset]["class2"],
-    #     is_dr=True,
-    #     name=f"{args.unlearning_model}_other",
-    # )
