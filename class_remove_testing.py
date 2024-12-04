@@ -60,7 +60,7 @@ def train(load=False):
     if load:
         clean_data = utils.get_original_data(args.dataset)
         utils.train_test_split(clean_data, args.random_seed, args.train_ratio, args.val_ratio)
-        utils.prints_stats(clean_data)
+        utils.print_stats(clean_data)
 
         clean_model = torch.load(
             f"{args.data_dir}/{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}_clean_model.pt"
@@ -91,7 +91,7 @@ def train(load=False):
     print("==TRAINING==")
     clean_data = utils.get_original_data(args.dataset)
     utils.train_test_split(clean_data, args.random_seed, args.train_ratio, args.val_ratio)
-    utils.prints_stats(clean_data)
+    utils.print_stats(clean_data)
     clean_model = GCN(clean_data.num_features, args.hidden_dim, clean_data.num_classes)
 
     optimizer = torch.optim.Adam(

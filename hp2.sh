@@ -1,3 +1,12 @@
+# python run_hp_tune.py --dataset Computers --data_dir /scratch/akshit.sinha/data --df_size 0.5 --random_seed 0 --attack_type label --db_name rebuttal_test_new_cf_0.25 --cf 0.25 --gnn gcn --gnndelete
+
+python eval_script.py --gnn gcn --dataset Computers --data_dir /scratch/akshit.sinha/data --attack_type label --db_name rebuttal_test_new_cf_0.25 --cf 0.25 --log_name rebuttal_cf_0.25 --start_seed 0 --end_seed 1 --gnndelete
+
+# python run_hp_tune.py --dataset Computers --data_dir /scratch/akshit.sinha/data --df_size 0.5 --random_seed 0 --attack_type label --db_name rebuttal_test_new_cf_0.05 --cf 0.05 --gnn gcn --gnndelete
+
+# python eval_script.py --gnn gcn --dataset Computers --data_dir /scratch/akshit.sinha/data --attack_type label --db_name rebuttal_test_new_cf_0.05 --cf 0.05 --log_name rebuttal_cf_0.05 --start_seed 0 --end_seed 5 --gnndelete
+
+
 # python run_hp_tune.py --dataset CS --df_size 3000 --random_seed 1 --data_dir /scratch/akshit.sinha/data3 --attack_type edge --db_name edge_main --gnn gcn --scrub --gif
 
 # python eval_script.py --dataset CS --attack_type edge --df_size 3000 --start_seed 0 --end_seed 5 --db_name edge_main --log_name edge_logs --scrub --gif
@@ -30,17 +39,17 @@
 
 # python eval_script.py --gnn gat --dataset Cora --attack_type label --db_name label_gat_main --log_name label_gat_logs --start_seed 0 --end_seed 5 --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete
 
-python run_hp_tune.py --dataset Cora --df_size 0.5 --random_seed 1 --data_dir /scratch/akshit.sinha/data3 --attack_type label --db_name label_gat_cf_0.05 --cf 0.05 --gnn gat --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete 
+# python run_hp_tune.py --dataset Cora --df_size 0.5 --random_seed 1 --data_dir /scratch/akshit.sinha/data3 --attack_type label --db_name label_gat_cf_0.05 --cf 0.05 --gnn gat --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete 
 
-python eval_script.py --gnn gat --dataset Cora --attack_type label --db_name label_gat_cf_0.05 --log_name label_gat_logs --cf 0.05 --start_seed 0 --end_seed 5 --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete
+# python eval_script.py --gnn gat --dataset Cora --attack_type label --db_name label_gat_cf_0.05 --log_name label_gat_logs --cf 0.05 --start_seed 0 --end_seed 5 --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete
 
-python run_hp_tune.py --dataset Cora --df_size 0.5 --random_seed 1 --data_dir /scratch/akshit.sinha/data3 --attack_type label --db_name label_gat_cf_0.5 --cf 0.5 --gnn gat --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete 
+# python run_hp_tune.py --dataset Cora --df_size 0.5 --random_seed 1 --data_dir /scratch/akshit.sinha/data3 --attack_type label --db_name label_gat_cf_0.5 --cf 0.5 --gnn gat --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete 
 
-python eval_script.py --gnn gat --dataset Cora --attack_type label --db_name label_gat_cf_0.5 --log_name label_gat_logs --cf 0.5 --start_seed 0 --end_seed 5 --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete
+# python eval_script.py --gnn gat --dataset Cora --attack_type label --db_name label_gat_cf_0.5 --log_name label_gat_logs --cf 0.5 --start_seed 0 --end_seed 5 --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete
 
-python run_hp_tune.py --dataset Cora --df_size 0.5 --random_seed 1 --data_dir /scratch/akshit.sinha/data3 --attack_type label --db_name label_gat_cf_0.75 --cf 0.75 --gnn gat --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete 
+# python run_hp_tune.py --dataset Cora --df_size 0.5 --random_seed 1 --data_dir /scratch/akshit.sinha/data3 --attack_type label --db_name label_gat_cf_0.75 --cf 0.75 --gnn gat --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete 
 
-python eval_script.py --gnn gat --dataset Cora --attack_type label --db_name label_gat_cf_0.75 --log_name label_gat_logs --cf 0.75 --start_seed 0 --end_seed 5 --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete
+# python eval_script.py --gnn gat --dataset Cora --attack_type label --db_name label_gat_cf_0.75 --log_name label_gat_logs --cf 0.75 --start_seed 0 --end_seed 5 --cacdc --scrub --yaum --contra_2 --megu --utu --gif --retrain --gnndelete
 
 
 

@@ -30,6 +30,7 @@ with open("classes_to_poison.json", "r") as f:
 
 with open("model_seeds.json") as f:
     model_seeds = json.load(f)
+    model_seeds = defaultdict(lambda: 1, model_seeds)
 
 def train(load=False):
     if load:
@@ -40,7 +41,7 @@ def train(load=False):
         utils.train_test_split(
             clean_data, model_seeds[args.dataset], args.train_ratio, args.val_ratio
         )
-        utils.prints_stats(clean_data)
+        utils.print_stats(clean_data)
 
         clean_model = torch.load(
             f"{args.data_dir}/{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_clean_model.pt"
@@ -93,7 +94,7 @@ def train(load=False):
     utils.train_test_split(
         clean_data, model_seeds[args.dataset], args.train_ratio, args.val_ratio
     )
-    utils.prints_stats(clean_data)
+    utils.print_stats(clean_data)
     clean_model = utils.get_model(
         args, clean_data.num_features, args.hidden_dim, clean_data.num_classes
     )
@@ -337,7 +338,7 @@ hp_tuning_params_dict = {
         "unlearn_lr": (1e-4, 1e-1, "log"),
         # "contrastive_margin": (1, 10, "log"),
         # "contrastive_lambda": (0.0, 1.0, "float"),
-        "contrastive_frac": (0.02, 0.8, "float"),
+        "contrastive_frac": (0.02, 0.1, "float"),
         "k_hop": (1, 3, "int"),
         "ascent_lr": (1e-6, 1e-3, "log"),
         "descent_lr": (1e-4, 1e-1, "log"),
@@ -450,6 +451,21 @@ def objective(trial, model, data):
 if __name__ == "__main__":
     print("\n\n\n")
     print(args.dataset, args.attack_type)
+    
+    # load best params for base gnns
+    # try:
+    #     with open(f"best_params/{args.gnn}_{args.dataset}.json", "r") as f:
+    #         params = json.load(f)
+    #         for key, value in params.items():
+    #             setattr(args, key, value)
+    # except FileNotFoundError:
+    #     print("No best params found for the base model")
+    #     print("Using default params")
+
+    if args.save_model:
+        clean_data = train()
+        poisoned_data, poisoned_indices, poisoned_model = poison(clean_data)
+        exit()
 
     clean_data = train(load=True)
     # clean_data = train()

@@ -28,6 +28,7 @@ with open("classes_to_poison.json", "r") as f:
 
 with open("model_seeds.json") as f:
     model_seeds = json.load(f)
+    model_seeds = defaultdict(lambda: 1, model_seeds)
 
 logger = Logger(
     args,
@@ -45,7 +46,7 @@ def train(load=False):
         utils.train_test_split(
             clean_data, model_seeds[args.dataset], args.train_ratio, args.val_ratio
         )
-        utils.prints_stats(clean_data)
+        utils.print_stats(clean_data)
 
         clean_model = torch.load(
             f"{args.data_dir}/{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_clean_model.pt"
@@ -100,7 +101,7 @@ def train(load=False):
     utils.train_test_split(
         clean_data, model_seeds[args.dataset], args.train_ratio, args.val_ratio
     )
-    utils.prints_stats(clean_data)
+    utils.print_stats(clean_data)
     clean_model = utils.get_model(
         args, clean_data.num_features, args.hidden_dim, clean_data.num_classes
     )
@@ -270,7 +271,7 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
     utils.find_masks(
         poisoned_data, poisoned_indices, args, attack_type=args.attack_type
     )
-    
+
     if "gnndelete" in args.unlearning_model:
         unlearn_model = utils.get_model(
             args,
@@ -321,13 +322,15 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
         )
 
     _, _, time_taken = unlearn_trainer.train()
-    
+
     if args.linked:
         acc, _, _ = unlearn_trainer.evaluate(is_dr=False) # REAL
     else:
         acc, _, _ = unlearn_trainer.evaluate(is_dr=True) # REAL
     # acc, _, _ = unlearn_trainer.evaluate(is_dr=False)  # TEST
     print(acc)
+    print(class_dataset_dict[args.dataset]["class1"])
+    print(class_dataset_dict[args.dataset]["class2"])
     forg, util, forget_f1, util_f1 = unlearn_trainer.get_score(
         args.attack_type,
         class1=class_dataset_dict[args.dataset]["class1"],
@@ -348,6 +351,11 @@ def unlearn(poisoned_data, poisoned_indices, poisoned_model):
             "time_taken": time_taken,
         },
     )
+    
+    # save to another file  
+    with open('temp_res.txt', 'a') as f:
+        f.write(f"{args.training_epochs}, {forg}, {util}\n")
+    
     print("==UNLEARNING DONE==")
     print("hiiiiiiiiiii")
     utils.plot_convergence(unlearn_trainer.losses, unlearn_trainer.loss_component)
@@ -359,11 +367,10 @@ if __name__ == "__main__":
     print("\n\n\n")
 
     print(args.dataset, args.attack_type)
-    # clean_data = train(load=True)
-    clean_data = train()
-    
-    
-    poisoned_data, poisoned_indices, poisoned_model = poison()
+    clean_data = train(load=True)
+    # clean_data = train()
+    poisoned_data, poisoned_indices, poisoned_model = poison(clean_data)
+    exit()
     # exit()
 
     # load best params file
@@ -377,7 +384,7 @@ if __name__ == "__main__":
         else:
             poisoned_indices = poisoned_data.poisoned_nodes
         print(f"No. of poisoned nodes: {len(poisoned_indices)}")
-        
+
         if args.attack_type == "edge":
             poisoned_indices, poisoned_nodes = utils.sample_poison_data_edges(poisoned_data, args.corrective_frac)
             poisoned_data.poisoned_edge_indices = poisoned_indices

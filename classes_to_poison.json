@@ -6,8 +6,8 @@
         "target_class": 15
     },
     "Amazon": {
-        "class1": 3,
-        "class2": 4,
+        "class1": 1,
+        "class2": 6,
         "victim_class": 1,
         "target_class": 6
     },
@@ -20,5 +20,25 @@
     "Computers": {
         "class1": 0,
         "class2": 6
+    },
+    "Flickr": {
+        "class1": 4,
+        "class2": 6
+    },
+    "Physics": {
+        "class1": 3,
+        "class2": 4
+    },
+    "Citeseer_p": {
+        "class1": 0,
+        "class2": 1
+    },
+    "DBLP": {
+        "class1": 2,
+        "class2": 3
+    },
+    "Cora_p": {
+        "class1": 0,
+        "class2": 1
     }
 }

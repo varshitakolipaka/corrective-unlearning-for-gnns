@@ -66,12 +66,22 @@ class Trainer:
         self.unlearning_time = 0
         self.best_model_time = 0
 
-        self.TIME_THRESHOLD = 3 # 3 seconds
+        self.TIME_THRESHOLD = 4 # 3 seconds
         
         self.is_trigg_val = False
 
-        self.class1 = class_dataset_dict[args.dataset]["class1"]
-        self.class2 = class_dataset_dict[args.dataset]["class2"]
+        try:
+            self.class1 = class_dataset_dict[args.dataset]["class1"]
+            self.class2 = class_dataset_dict[args.dataset]["class2"]
+        except:
+            # set default values
+            self.class1 = 0
+            self.class2 = 1
+            
+            # update the class_dataset_dict file with default values
+            class_dataset_dict[args.dataset] = {"class1": self.class1, "class2": self.class2}
+            with open("classes_to_poison.json", "w") as f:
+                json.dump(class_dataset_dict, f, indent=4)
 
         self.poisoned_classes = [self.class1, self.class2]
         self.clean_classes = []
@@ -103,10 +113,17 @@ class Trainer:
             losses.append(loss)
             if epoch % 10 == 0:
                 print(f"Epoch: {epoch}, Loss: {loss.item()}")
+                train_acc, msc_rate, f1 = self.evaluate()
+                print(f"epoch: {epoch}, train_acc: {train_acc}")
+                # save epoch results to a file
+                # with open(f"temp/{self.args.experiment_name}_train_results.txt", "a") as f:
+                #     f.write(f"{epoch}, {train_acc}\n")
+                
             self.optimizer.step()
             self.optimizer.zero_grad()
         time_taken = time.time() - st
         train_acc, msc_rate, f1 = self.evaluate()
+        print(f"epoch: {epoch}, train_acc: {train_acc}")
         # print(f'Train Acc: {train_acc}, Misclassification: {msc_rate},  F1 Score: {f1}')
         # plot_loss_vs_epochs(losses)
         return train_acc, msc_rate, time_taken
@@ -150,7 +167,6 @@ class Trainer:
 
         for poisoned_class in poisoned_classes:
             poisoned_indices = true_labels == poisoned_class
-            
             if poisoned_indices.sum() == 0:
                 continue
             

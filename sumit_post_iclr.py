@@ -45,7 +45,7 @@ def train(load=False):
         utils.train_test_split(
             clean_data, model_seeds[args.dataset], args.train_ratio, args.val_ratio
         )
-        utils.prints_stats(clean_data)
+        utils.print_stats(clean_data)
 
         clean_model = torch.load(
             f"{args.data_dir}/{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_clean_model.pt"
@@ -87,7 +87,7 @@ def train(load=False):
     utils.train_test_split(
         clean_data, args.random_seed, args.train_ratio, args.val_ratio
     )
-    utils.prints_stats(clean_data)
+    utils.print_stats(clean_data)
     clean_model = utils.get_model(
         args, clean_data.num_features, args.hidden_dim, clean_data.num_classes
     )

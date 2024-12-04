@@ -12,6 +12,8 @@ import seaborn as sns
 from sklearn.manifold import TSNE
 from torch_geometric.utils import subgraph
 from scipy.spatial import ConvexHull
+import matplotlib.pyplot as plt
+
 
 from trainers.contrascent import ContrastiveAscentTrainer
 from trainers.contrascent_no_link import ContrastiveAscentNoLinkTrainer
@@ -250,7 +252,7 @@ def get_optimizer(args, poisoned_model):
         optimizer_unlearn = torch.optim.Adam(parameters_to_optimize, lr=args.unlearn_lr)
     return optimizer_unlearn
 
-def prints_stats(data):
+def print_stats(data):
     # print the stats of the dataset
     print("Number of nodes: ", data.num_nodes)
     print("Number of edges: ", data.num_edges)
@@ -259,12 +261,13 @@ def prints_stats(data):
     print("Number of training nodes: ", data.train_mask.sum().item())
     print("Number of testing nodes: ", data.test_mask.sum().item())
 
-    # get counts of each class
-    counts = [0] * data.num_classes
+    # get counts of each class in training set
+    print("Class distribution in training set")
     for i in range(data.num_classes):
-        counts[i] = (data.y == i).sum().item()
+        print(f"Class {i}: {data.y[data.train_mask].eq(i).sum().item()}")
+    print("Class distribution in testing set")
     for i in range(data.num_classes):
-        print(f"Number of nodes in class {i}: {counts[i]}")
+        print(f"Class {i}: {data.y[data.test_mask].eq(i).sum().item()}")
 
 def rotate_embeddings(embeddings, angle):
     """

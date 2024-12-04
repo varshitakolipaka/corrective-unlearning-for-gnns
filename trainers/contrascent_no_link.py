@@ -1,3 +1,4 @@
+import json
 import os, math
 import copy
 from pprint import pprint
@@ -21,24 +22,8 @@ from .base import Trainer
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-class_dataset_dict = {
-    "Cora": {
-        "class1": 5,
-        "class2": 63,
-    },
-    "PubMed": {
-        "class1": 2,
-        "class2": 1,
-    },
-    "Amazon": {
-        "class1": 3,
-        "class2": 4,
-    },
-    "CS": {
-        "class1": 3,
-        "class2": 12,
-    },
-}
+with open("classes_to_poison.json", "r") as f:
+    class_dataset_dict = json.load(f)
 
 def time_it(func):
     def wrapper(*args, **kwargs):
@@ -184,6 +169,25 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         #  get the top 10% of the indices
         frac = self.args.contrastive_frac
         _, indices = torch.topk(diff, int(frac * len(subset)), largest=True)
+        
+        # # load the indices
+        # if self.args.training_epochs < 1200:
+        #     indices = torch.load(f"indices_{self.args.training_epochs - 1}.pt")
+            
+        # # select indices randomly
+        # seed
+        # torch.manual_seed(self.args.random_seed)
+        # indices = torch.randperm(len(subset))[:int(frac * len(subset))]
+        
+        # save the indices
+        # torch.save(indices, f"indices_{self.args.training_epochs - 1}.pt")
+        # exit()
+        # get the bottom frac of the indices
+        # _, indices = torch.topk(diff, int(frac * len(subset)), largest=False)
+        
+        # set indices to all be the first element in the subset
+        # indices = torch.tensor([subset[0] for _ in range(int(frac * len(subset)))])
+        
 
         influence_nodes_with_unlearning_nodes = indices
 
@@ -578,7 +582,6 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
 
         # attacked idx must be a list of nodes
         for epoch in trange(args.steps, desc="Unlearning"):
-            self.save_best()
             for i in range(args.contrastive_epochs_1 + args.contrastive_epochs_2):
                 iter_start_time = time.time()
                 self.model.train()
@@ -595,8 +598,11 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     loss = self.run_sage_batch()
                     self.log_loss_info(loss, 'contrastive')
 
+
                     loss.backward()
                     optimizer.step()
+                    with open("losses.txt", "a") as f:
+                        f.write(f"{epoch},{i},{loss.item()}, contrastive\n")
                 else:
                     ascent_optimizer.zero_grad()
 
@@ -606,6 +612,9 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     ascent_loss.backward()
                     ascent_optimizer.step()
                     # ascent_scheduler.step()
+                    
+                    with open("losses.txt", "a") as f:
+                        f.write(f"{epoch},{i},{ascent_loss.item()}, ascent\n")
 
                     descent_optimizer.zero_grad()
 
@@ -623,6 +632,9 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     # kd_loss = self.kd_loss()
                     descent_loss = finetune_loss
                     self.log_loss_info(ascent_loss, 'descent')
+                    
+                    with open("losses.txt", "a") as f:
+                        f.write(f"{epoch},{i},{descent_loss.item()}, descent\n")
 
                     descent_loss.backward()
                     descent_optimizer.step()

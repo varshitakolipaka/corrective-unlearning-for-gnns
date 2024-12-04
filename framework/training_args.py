@@ -126,6 +126,8 @@ def parse_args():
     parser.add_argument('--log_name', type=str, default='default', help='log name')
     
     parser.add_argument('--linked', action='store_true', help='whether to use linked model')
+    
+    parser.add_argument('-sm', '--save_model', action='store_true', help='whether to save model')
 
     args = parser.parse_args()
     args.experiment_name = f"{args.dataset}_{args.attack_type}_{args.unlearning_model}_{args.gnn}_{args.corrective_frac}_{args.db_name}"

@@ -30,6 +30,9 @@ with open("classes_to_poison.json", "r") as f:
 
 with open("model_seeds.json") as f:
     model_seeds = json.load(f)
+    # make a defautdict
+    model_seeds = defaultdict(lambda: 1, model_seeds)
+
 
 def train(load=False):
     if load:
@@ -40,7 +43,7 @@ def train(load=False):
         utils.train_test_split(
             clean_data, model_seeds[args.dataset], args.train_ratio, args.val_ratio
         )
-        utils.prints_stats(clean_data)
+        utils.print_stats(clean_data)
 
         clean_model = torch.load(
             f"{args.data_dir}/{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_clean_model.pt"
@@ -93,11 +96,11 @@ def train(load=False):
     utils.train_test_split(
         clean_data, model_seeds[args.dataset], args.train_ratio, args.val_ratio
     )
-    utils.prints_stats(clean_data)
+    utils.print_stats(clean_data)
     clean_model = utils.get_model(
         args, clean_data.num_features, args.hidden_dim, clean_data.num_classes
     )
-    
+
     return clean_data, clean_model
 
     optimizer = torch.optim.Adam(
@@ -124,6 +127,7 @@ def train(load=False):
         f"{args.data_dir}/{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_clean_model.pt",
     )
     return clean_data, clean_model
+
 
 def poison(clean_data=None):
     if clean_data is None:
@@ -392,7 +396,10 @@ hp_tuning_params_dict = {
     "clean": {
         "train_lr": (1e-5, 1e-1, "log"),
         "weight_decay": (1e-5, 1e-1, "log"),
-        "training_epochs": (500, 1600, "int"),
+        "training_epochs": (
+            [600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500],
+            "categorical",
+        ),
     },
 }
 
@@ -443,6 +450,7 @@ def objective(trial, model, data):
     # We want to minimize misclassification rate and maximize accuracy
     return obj
 
+
 def objective_clean(trial, model, data):
     # Define the hyperparameters to tune
     set_hp_tuning_params(trial, is_clean=True)
@@ -457,7 +465,6 @@ def objective_clean(trial, model, data):
     _, _, time_taken = trainer.train()
 
     obj, _, _ = trainer.evaluate(is_dr=False, use_val=True)  # REAL
-
 
     forget_acc, util_acc, forget_f1, util_f1 = trainer.get_score(
         args.attack_type,
@@ -479,7 +486,7 @@ if __name__ == "__main__":
     print(args.dataset, args.attack_type)
     # clean_data = train()
     clean_data, clean_model = train(load=False)
-    
+
     # poisoned_data, poisoned_indices, poisoned_model = poison()
 
     # if args.corrective_frac < 1:
@@ -537,7 +544,7 @@ if __name__ == "__main__":
     #     model.load_state_dict(poisoned_model.state_dict())
 
     # objective_func = partial(objective, model=model, data=poisoned_data)
-    
+
     objective_func = partial(objective_clean, model=clean_model, data=clean_data)
 
     print("==HYPERPARAMETER TUNING==")
@@ -564,3 +571,10 @@ if __name__ == "__main__":
     #     study.optimize(objective_func, n_trials=200)
     else:
         study.optimize(objective_func, n_trials=30)
+
+        # retrieve the best parameters
+    best_params = study.best_params
+
+    # save the best parameters
+    with open(f"best_params/{args.gnn}_{args.dataset}.json", "w") as f:
+        json.dump(best_params, f)

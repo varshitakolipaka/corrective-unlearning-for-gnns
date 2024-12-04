@@ -1,0 +1,8 @@
+epoch,step,loss,loss_type
+0,3,153.37094116210938,contrastive
+1,3,1477.962890625,contrastive
+2,3,694.3388671875,contrastive
+3,3,546.1484375,contrastive
+4,3,380.6384887695313,contrastive
+5,3,266.0378723144531,contrastive
+6,3,175.8896026611328,contrastive

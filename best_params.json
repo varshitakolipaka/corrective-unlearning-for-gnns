@@ -891,6 +891,120 @@
             "unlearn_lr": 0.022538766060849175,
             "scrubAlpha": 5.205503669626286,
             "msteps": 20
+        },
+        "Amazon_label_scrub_gcn_1_exp_rebuttal_large_percent_nodes_in_Sf": {
+            "unlearn_iters": 199,
+            "unlearn_lr": 0.01802913216152521,
+            "scrubAlpha": 6.265396682485639e-05,
+            "msteps": 43
+        },
+        "Flickr_label_scrub_gcn_1_flickr_test": {
+            "unlearn_iters": 203,
+            "unlearn_lr": 0.024508805808833748,
+            "scrubAlpha": 9.244263657608695,
+            "msteps": 14
+        },
+        "Computers_label_scrub_gcn_1_rebuttal_test": {
+            "unlearn_iters": 195,
+            "unlearn_lr": 0.0033122336345582626,
+            "scrubAlpha": 8.158231098307029,
+            "msteps": 10
+        },
+        "Physics_label_scrub_gcn_1_rebuttal_test": {
+            "unlearn_iters": 154,
+            "unlearn_lr": 0.058882909982420864,
+            "scrubAlpha": 0.49656386644914474,
+            "msteps": 75
+        },
+        "DBLP_label_scrub_gcn_1_rebuttal_test_new": {
+            "unlearn_iters": 217,
+            "unlearn_lr": 0.0543061445037573,
+            "scrubAlpha": 0.0005593242110301216,
+            "msteps": 10
+        },
+        "Physics_label_scrub_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "unlearn_iters": 208,
+            "unlearn_lr": 0.012509937345878581,
+            "scrubAlpha": 1.5172456990925333e-05,
+            "msteps": 29
+        },
+        "Computers_label_scrub_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "unlearn_iters": 251,
+            "unlearn_lr": 1.0372890417754049e-05,
+            "scrubAlpha": 1.2820470314731827,
+            "msteps": 11
+        },
+        "DBLP_label_scrub_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "unlearn_iters": 129,
+            "unlearn_lr": 0.009143287089895454,
+            "scrubAlpha": 1.704340855747636e-05,
+            "msteps": 10
+        },
+        "Physics_label_scrub_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "unlearn_iters": 167,
+            "unlearn_lr": 0.060752005713703226,
+            "scrubAlpha": 0.5817410362590081,
+            "msteps": 76
+        },
+        "Computers_label_scrub_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "unlearn_iters": 153,
+            "unlearn_lr": 0.0019123945195110984,
+            "scrubAlpha": 0.4987624508815128,
+            "msteps": 10
+        },
+        "DBLP_label_scrub_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "unlearn_iters": 200,
+            "unlearn_lr": 0.05902105751749439,
+            "scrubAlpha": 0.0018659606152764234,
+            "msteps": 10
+        },
+        "Physics_label_scrub_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "unlearn_iters": 183,
+            "unlearn_lr": 0.09969363599440931,
+            "scrubAlpha": 0.37077001868684795,
+            "msteps": 147
+        },
+        "Computers_label_scrub_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "unlearn_iters": 269,
+            "unlearn_lr": 0.00023954245804318634,
+            "scrubAlpha": 0.6191317559785139,
+            "msteps": 12
+        },
+        "DBLP_label_scrub_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "unlearn_iters": 291,
+            "unlearn_lr": 0.030184891620105098,
+            "scrubAlpha": 0.0042531297231441,
+            "msteps": 17
+        },
+        "Physics_label_scrub_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "unlearn_iters": 179,
+            "unlearn_lr": 0.027243298898974727,
+            "scrubAlpha": 5.521070804141328e-06,
+            "msteps": 24
+        },
+        "Computers_label_scrub_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "unlearn_iters": 285,
+            "unlearn_lr": 0.0020306653592442802,
+            "scrubAlpha": 9.020081474872956,
+            "msteps": 10
+        },
+        "DBLP_label_scrub_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "unlearn_iters": 271,
+            "unlearn_lr": 0.06574897187693736,
+            "scrubAlpha": 1.144304074677682e-05,
+            "msteps": 14
+        },
+        "Physics_label_scrub_gcn_0.5_rebuttal_test_2_new_cf_0.5": {
+            "unlearn_iters": 146,
+            "unlearn_lr": 0.09902706025959218,
+            "scrubAlpha": 0.4082857987847291,
+            "msteps": 73
+        },
+        "Physics_label_scrub_gcn_0.25_rebuttal_test_2_new_cf_0.25": {
+            "unlearn_iters": 186,
+            "unlearn_lr": 0.09284933758390229,
+            "scrubAlpha": 0.4328048108017105,
+            "msteps": 98
         }
     },
     "gnndelete": {
@@ -1272,6 +1386,120 @@
             "unlearn_lr": 0.0042932306214607035,
             "weight_decay": 3.568197456619018e-05,
             "alpha": 0.14589381388773914,
+            "loss_type": "only3_all"
+        },
+        "Amazon_label_gnndelete_gcn_1_exp_rebuttal_large_percent_nodes_in_Sf": {
+            "unlearn_lr": 0.04218836655820924,
+            "weight_decay": 0.000619905959414883,
+            "alpha": 0.8038272252817776,
+            "loss_type": "only3_all"
+        },
+        "Flickr_label_gnndelete_gcn_1_flickr_test": {
+            "unlearn_lr": 0.01909871266954521,
+            "weight_decay": 0.007056967096518176,
+            "alpha": 0.8014081477102908,
+            "loss_type": "only3_all"
+        },
+        "Physics_label_gnndelete_gcn_1_rebuttal_test": {
+            "unlearn_lr": 0.05463089131944474,
+            "weight_decay": 0.051153655661311054,
+            "alpha": 0.0617359640004464,
+            "loss_type": "both_layerwise"
+        },
+        "Computers_label_gnndelete_gcn_1_rebuttal_test": {
+            "unlearn_lr": 0.00031489116479568613,
+            "weight_decay": 0.06351221010640701,
+            "alpha": 0.7319939418114051,
+            "loss_type": "only1"
+        },
+        "DBLP_label_gnndelete_gcn_1_rebuttal_test_new": {
+            "unlearn_lr": 0.023581887732933893,
+            "weight_decay": 0.00882290310767514,
+            "alpha": 0.15024716871760443,
+            "loss_type": "only3"
+        },
+        "Physics_label_gnndelete_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "unlearn_lr": 0.026003128644545317,
+            "weight_decay": 0.018020907429064217,
+            "alpha": 0.029772501213245706,
+            "loss_type": "only3"
+        },
+        "Computers_label_gnndelete_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "unlearn_lr": 0.01805903345018524,
+            "weight_decay": 0.056303139930846666,
+            "alpha": 0.030384265615186618,
+            "loss_type": "only3"
+        },
+        "DBLP_label_gnndelete_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "unlearn_lr": 0.06661242047384068,
+            "weight_decay": 0.0015261133352785182,
+            "alpha": 0.024091491817141132,
+            "loss_type": "only3"
+        },
+        "Physics_label_gnndelete_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "unlearn_lr": 0.05326373422425814,
+            "weight_decay": 5.720854313654119e-05,
+            "alpha": 0.08870534174986235,
+            "loss_type": "only3_all"
+        },
+        "Computers_label_gnndelete_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "unlearn_lr": 0.00031489116479568613,
+            "weight_decay": 0.06351221010640701,
+            "alpha": 0.7319939418114051,
+            "loss_type": "only1"
+        },
+        "DBLP_label_gnndelete_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "unlearn_lr": 0.012325426534568116,
+            "weight_decay": 0.056838898220855354,
+            "alpha": 0.002549796165629948,
+            "loss_type": "both_layerwise"
+        },
+        "Physics_label_gnndelete_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "unlearn_lr": 0.021307093422819473,
+            "weight_decay": 1.6026438885390157e-05,
+            "alpha": 0.00018972669223621917,
+            "loss_type": "only3"
+        },
+        "Computers_label_gnndelete_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "unlearn_lr": 0.02502794030865126,
+            "weight_decay": 0.02453376824899373,
+            "alpha": 0.05849737364060533,
+            "loss_type": "only3_all"
+        },
+        "DBLP_label_gnndelete_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "unlearn_lr": 0.03827260494299453,
+            "weight_decay": 0.013677200919124053,
+            "alpha": 0.06415503792357316,
+            "loss_type": "both_layerwise"
+        },
+        "Physics_label_gnndelete_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "unlearn_lr": 0.08193040209788709,
+            "weight_decay": 1.0381902110866266e-05,
+            "alpha": 0.11050128369624954,
+            "loss_type": "both_all"
+        },
+        "Computers_label_gnndelete_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "unlearn_lr": 0.00031489116479568613,
+            "weight_decay": 0.06351221010640701,
+            "alpha": 0.7319939418114051,
+            "loss_type": "only1"
+        },
+        "DBLP_label_gnndelete_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "unlearn_lr": 0.01849186066061139,
+            "weight_decay": 0.011613467111334663,
+            "alpha": 0.0022134359343069943,
+            "loss_type": "both_layerwise"
+        },
+        "Physics_label_gnndelete_gcn_0.25_rebuttal_test_2_new_cf_0.25": {
+            "unlearn_lr": 0.06154758845506694,
+            "weight_decay": 0.025017569631410427,
+            "alpha": 0.6825748364159457,
+            "loss_type": "only3_all"
+        },
+        "Physics_label_gnndelete_gcn_0.5_rebuttal_test_2_new_cf_0.5": {
+            "unlearn_lr": 0.09011067182348335,
+            "weight_decay": 0.021516989274822908,
+            "alpha": 0.4288376163639961,
             "loss_type": "only3_all"
         }
     },
@@ -1930,6 +2158,108 @@
             "kappa": 0.006362352106392601,
             "alpha1": 0.5173525652140666,
             "alpha2": 0.5471861423828268
+        },
+        "Physics_label_megu_gcn_1_rebuttal_test_new": {
+            "unlearn_lr": 2.7306753974588766e-05,
+            "kappa": 0.7591068607254932,
+            "alpha1": 0.5720346296559878,
+            "alpha2": 0.5887627613015504
+        },
+        "Computers_label_megu_gcn_1_rebuttal_test_new": {
+            "unlearn_lr": 0.0002698330610716377,
+            "kappa": 0.0026599237051694786,
+            "alpha1": 0.7870687060239716,
+            "alpha2": 0.17015386275553673
+        },
+        "DBLP_label_megu_gcn_1_rebuttal_test_new": {
+            "unlearn_lr": 3.989040666268479e-05,
+            "kappa": 0.41680701415148974,
+            "alpha1": 0.995898336017947,
+            "alpha2": 0.31717320768674584
+        },
+        "Physics_label_megu_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "unlearn_lr": 3.0737328878717595e-05,
+            "kappa": 0.6834171597094072,
+            "alpha1": 0.6885423566786502,
+            "alpha2": 0.9974698284809732
+        },
+        "Computers_label_megu_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "unlearn_lr": 9.306104945173452e-05,
+            "kappa": 0.0010018122477963428,
+            "alpha1": 0.6394675265016482,
+            "alpha2": 0.7954047253853496
+        },
+        "DBLP_label_megu_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "unlearn_lr": 0.0002364886313910586,
+            "kappa": 0.13039402596021918,
+            "alpha1": 0.7794282023116786,
+            "alpha2": 0.5848445833052249
+        },
+        "Physics_label_megu_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "unlearn_lr": 0.0002597998671415668,
+            "kappa": 0.46405830965904404,
+            "alpha1": 0.38517868339323197,
+            "alpha2": 0.5216097580815088
+        },
+        "Computers_label_megu_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "unlearn_lr": 5.163344068529037e-05,
+            "kappa": 0.03134168407775816,
+            "alpha1": 0.8459928875306427,
+            "alpha2": 0.12115033125095362
+        },
+        "DBLP_label_megu_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "unlearn_lr": 1.322363271293454e-05,
+            "kappa": 0.9649549970087352,
+            "alpha1": 0.14907096617179436,
+            "alpha2": 0.2610286175048525
+        },
+        "Physics_label_megu_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "unlearn_lr": 0.0001899614964583025,
+            "kappa": 0.868058755742989,
+            "alpha1": 0.9382165673076723,
+            "alpha2": 0.27193784443257346
+        },
+        "Computers_label_megu_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "unlearn_lr": 0.00035087629442252544,
+            "kappa": 0.008049343627173343,
+            "alpha1": 0.6234963127067392,
+            "alpha2": 0.10382673012536006
+        },
+        "DBLP_label_megu_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "unlearn_lr": 5.619290209360315e-05,
+            "kappa": 0.34833058815273005,
+            "alpha1": 0.5338100723845072,
+            "alpha2": 0.34408237499820793
+        },
+        "Physics_label_megu_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "unlearn_lr": 0.0003875446019002129,
+            "kappa": 0.6204410850482175,
+            "alpha1": 0.28870548620718584,
+            "alpha2": 0.2954690763451851
+        },
+        "Computers_label_megu_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "unlearn_lr": 0.00035670741163118264,
+            "kappa": 0.004643639800501197,
+            "alpha1": 0.7685973461204916,
+            "alpha2": 0.35670396970807094
+        },
+        "DBLP_label_megu_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "unlearn_lr": 0.00017362186608914005,
+            "kappa": 0.9649549970087352,
+            "alpha1": 0.10617411293848456,
+            "alpha2": 0.816345495856096
+        },
+        "Physics_label_megu_gcn_0.25_rebuttal_test_2_new_cf_0.25": {
+            "unlearn_lr": 0.00037905267795369877,
+            "kappa": 0.0029790047630329952,
+            "alpha1": 0.2345886830891452,
+            "alpha2": 0.4624350550794506
+        },
+        "Physics_label_megu_gcn_0.5_rebuttal_test_2_new_cf_0.5": {
+            "unlearn_lr": 0.00023136889312603474,
+            "kappa": 0.010883788084696108,
+            "alpha1": 0.7006456583257233,
+            "alpha2": 0.20942931502282147
         }
     },
     "ssd": {
@@ -2633,6 +2963,11 @@
             "unlearn_iters": 225,
             "ascent_lr": 0.000672429184449309,
             "descent_lr": 0.013665216304702221
+        },
+        "Flickr_label_yaum_gcn_1_flickr_test": {
+            "unlearn_iters": 300,
+            "ascent_lr": 6.198884579186934e-05,
+            "descent_lr": 0.015837307229923596
         }
     },
     "contrascent": {
@@ -3290,6 +3625,236 @@
             "k_hop": 2,
             "ascent_lr": 3.392070287726541e-05,
             "descent_lr": 0.09689056179833237
+        },
+        "Amazon_label_cacdc_gcn_1_exp_rebuttal_large_percent_nodes_in_Sf": {
+            "contrastive_epochs_1": 1,
+            "contrastive_epochs_2": 20,
+            "steps": 10,
+            "unlearn_lr": 0.0008873219286359221,
+            "contrastive_frac": 0.2569579250328028,
+            "k_hop": 1,
+            "ascent_lr": 0.0002731264515671488,
+            "descent_lr": 0.00756314498153361
+        },
+        "Flickr_label_cacdc_gcn_1_flickr_test": {
+            "contrastive_epochs_1": 5,
+            "contrastive_epochs_2": 24,
+            "steps": 1,
+            "unlearn_lr": 0.0022873112906807167,
+            "contrastive_frac": 0.028389480608423095,
+            "k_hop": 2,
+            "ascent_lr": 0.00016292594936645767,
+            "descent_lr": 0.015210053224448631
+        },
+        "Physics_label_cacdc_gcn_1_rebuttal_test": {
+            "contrastive_epochs_1": 10,
+            "contrastive_epochs_2": 26,
+            "steps": 10,
+            "unlearn_lr": 0.00016330033522440687,
+            "contrastive_frac": 0.01184826695586819,
+            "k_hop": 3,
+            "ascent_lr": 1.7087814661939144e-06,
+            "descent_lr": 0.07453405403071743
+        },
+        "Computers_label_cacdc_gcn_1_rebuttal_test": {
+            "contrastive_epochs_1": 7,
+            "contrastive_epochs_2": 30,
+            "steps": 8,
+            "unlearn_lr": 0.0008555306010024223,
+            "contrastive_frac": 0.04071650868307444,
+            "k_hop": 1,
+            "ascent_lr": 2.7267051467958295e-05,
+            "descent_lr": 0.01261298385678297
+        },
+        "Computers_label_cacdc_gcn_1_rebuttal_test_new": {
+            "contrastive_epochs_1": 2,
+            "contrastive_epochs_2": 18,
+            "steps": 7,
+            "unlearn_lr": 0.003084515618016896,
+            "contrastive_frac": 0.044648943207536214,
+            "k_hop": 2,
+            "ascent_lr": 1.5714070827053334e-05,
+            "descent_lr": 0.017305680735112686
+        },
+        "Physics_label_cacdc_gcn_1_rebuttal_test_new": {
+            "contrastive_epochs_1": 1,
+            "contrastive_epochs_2": 26,
+            "steps": 7,
+            "unlearn_lr": 0.002753944734902742,
+            "contrastive_frac": 0.038108018515284114,
+            "k_hop": 2,
+            "ascent_lr": 4.434122380577851e-06,
+            "descent_lr": 0.09608275036047736
+        },
+        "DBLP_label_cacdc_gcn_1_rebuttal_test_new": {
+            "contrastive_epochs_1": 8,
+            "contrastive_epochs_2": 25,
+            "steps": 10,
+            "unlearn_lr": 0.013278851640522529,
+            "contrastive_frac": 0.024018570860677168,
+            "k_hop": 2,
+            "ascent_lr": 0.00010992418335340566,
+            "descent_lr": 0.060301726329995906
+        },
+        "Physics_label_cacdc_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "contrastive_epochs_1": 8,
+            "contrastive_epochs_2": 30,
+            "steps": 3,
+            "unlearn_lr": 0.028345153051999448,
+            "contrastive_frac": 0.02758824414238263,
+            "k_hop": 2,
+            "ascent_lr": 2.0797439835329068e-05,
+            "descent_lr": 0.006770519405419093
+        },
+        "Computers_label_cacdc_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "contrastive_epochs_1": 5,
+            "contrastive_epochs_2": 16,
+            "steps": 4,
+            "unlearn_lr": 0.0011848779062316583,
+            "contrastive_frac": 0.09689132180591195,
+            "k_hop": 1,
+            "ascent_lr": 0.00019204690168761872,
+            "descent_lr": 0.008624929213578788
+        },
+        "DBLP_label_cacdc_gcn_0.05_rebuttal_test_new_cf_0.05": {
+            "contrastive_epochs_1": 8,
+            "contrastive_epochs_2": 14,
+            "steps": 10,
+            "unlearn_lr": 0.01083756596334404,
+            "contrastive_frac": 0.05717247494874441,
+            "k_hop": 2,
+            "ascent_lr": 1.906346257719488e-05,
+            "descent_lr": 0.07994026862612334
+        },
+        "Physics_label_cacdc_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "contrastive_epochs_1": 8,
+            "contrastive_epochs_2": 17,
+            "steps": 3,
+            "unlearn_lr": 0.0017589423090023212,
+            "contrastive_frac": 0.08296786407604406,
+            "k_hop": 2,
+            "ascent_lr": 0.0009820721626877635,
+            "descent_lr": 0.09844601159932177
+        },
+        "Computers_label_cacdc_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "contrastive_epochs_1": 5,
+            "contrastive_epochs_2": 14,
+            "steps": 10,
+            "unlearn_lr": 0.0007550182301128142,
+            "contrastive_frac": 0.05257140247302672,
+            "k_hop": 1,
+            "ascent_lr": 0.0005816313507566609,
+            "descent_lr": 0.00551083377116049
+        },
+        "DBLP_label_cacdc_gcn_0.5_rebuttal_test_new_cf_0.5": {
+            "contrastive_epochs_1": 8,
+            "contrastive_epochs_2": 25,
+            "steps": 8,
+            "unlearn_lr": 0.0004597452722775196,
+            "contrastive_frac": 0.046484739006331384,
+            "k_hop": 1,
+            "ascent_lr": 0.0009781702152548523,
+            "descent_lr": 0.00911592267197923
+        },
+        "Physics_label_cacdc_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "contrastive_epochs_1": 1,
+            "contrastive_epochs_2": 22,
+            "steps": 4,
+            "unlearn_lr": 0.010507613800025564,
+            "contrastive_frac": 0.03650821543168716,
+            "k_hop": 3,
+            "ascent_lr": 6.581631677422048e-05,
+            "descent_lr": 0.09846417000555596
+        },
+        "Computers_label_cacdc_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "contrastive_epochs_1": 9,
+            "contrastive_epochs_2": 21,
+            "steps": 8,
+            "unlearn_lr": 0.0003816653802352091,
+            "contrastive_frac": 0.0973380529454407,
+            "k_hop": 1,
+            "ascent_lr": 4.43089560486505e-05,
+            "descent_lr": 0.01101475092347567
+        },
+        "DBLP_label_cacdc_gcn_0.25_rebuttal_test_new_cf_0.25": {
+            "contrastive_epochs_1": 9,
+            "contrastive_epochs_2": 16,
+            "steps": 9,
+            "unlearn_lr": 0.00037250271725591333,
+            "contrastive_frac": 0.0896719136584046,
+            "k_hop": 1,
+            "ascent_lr": 0.0007443016883122133,
+            "descent_lr": 0.006175198161484993
+        },
+        "Physics_label_cacdc_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "contrastive_epochs_1": 4,
+            "contrastive_epochs_2": 9,
+            "steps": 3,
+            "unlearn_lr": 0.0005219466310426294,
+            "contrastive_frac": 0.08304948691473912,
+            "k_hop": 2,
+            "ascent_lr": 4.869273177241596e-06,
+            "descent_lr": 0.09646915582474683
+        },
+        "Computers_label_cacdc_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "contrastive_epochs_1": 1,
+            "contrastive_epochs_2": 28,
+            "steps": 8,
+            "unlearn_lr": 0.006708286954312773,
+            "contrastive_frac": 0.08788174299374428,
+            "k_hop": 1,
+            "ascent_lr": 0.0003789464164904138,
+            "descent_lr": 0.0023459444309912696
+        },
+        "DBLP_label_cacdc_gcn_0.75_rebuttal_test_new_cf_0.75": {
+            "contrastive_epochs_1": 3,
+            "contrastive_epochs_2": 22,
+            "steps": 9,
+            "unlearn_lr": 0.0011565183709057215,
+            "contrastive_frac": 0.07081238545046065,
+            "k_hop": 1,
+            "ascent_lr": 0.0006590472029691104,
+            "descent_lr": 0.002152565619633634
+        },
+        "Physics_label_cacdc_gcn_0.25_rebuttal_test_2_new_cf_0.25": {
+            "contrastive_epochs_1": 1,
+            "contrastive_epochs_2": 29,
+            "steps": 3,
+            "unlearn_lr": 0.00017836670727983914,
+            "contrastive_frac": 0.04573230099809444,
+            "k_hop": 1,
+            "ascent_lr": 0.00018987796392908518,
+            "descent_lr": 0.09816639378177167
+        },
+        "Physics_label_cacdc_gcn_0.5_rebuttal_test_2_new_cf_0.5": {
+            "contrastive_epochs_1": 4,
+            "contrastive_epochs_2": 28,
+            "steps": 7,
+            "unlearn_lr": 0.0034540068065364326,
+            "contrastive_frac": 0.08443944391040813,
+            "k_hop": 2,
+            "ascent_lr": 1.3825908133101247e-06,
+            "descent_lr": 0.09918664632674518
+        },
+        "Cora_label_cacdc_gcn_1_exp_ks": {
+            "contrastive_epochs_1": 4,
+            "contrastive_epochs_2": 28,
+            "steps": 8,
+            "unlearn_lr": 0.010459852712091591,
+            "contrastive_frac": 0.04481054961523677,
+            "k_hop": 2,
+            "ascent_lr": 2.9818765427759384e-05,
+            "descent_lr": 0.049977254402587115
+        },
+        "Cora_label_cacdc_gcn_1_exp_ks_2": {
+            "contrastive_epochs_1": 5,
+            "contrastive_epochs_2": 29,
+            "steps": 9,
+            "unlearn_lr": 0.017260617137701512,
+            "contrastive_frac": 0.046790616362974546,
+            "k_hop": 2,
+            "ascent_lr": 1.960839985905275e-06,
+            "descent_lr": 0.012970266261981743
         }
     },
     "scrub_no_kl": {
