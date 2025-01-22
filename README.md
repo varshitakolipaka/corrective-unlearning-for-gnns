@@ -1,3 +1,21 @@
+<h1 align="center">
+ A <i>Cognac</i> Shot To Forget Bad Memories: Corrective Unlearning in GNNs
+</h1>
+
+<p align="center">
+ <a href="https://arxiv.org/abs/2412.00789">📄 Paper</a> •
+ <a href="#citation">📝 Citation</a>
+</p>
+
+### Authors
+[Varshita Kolipaka](https://github.com/varshitakolipaka)<sup>*1</sup>, [Akshit Sinha](https://github.com/viciousAegis)<sup>*1</sup>, [Debangan Mishra](https://github.com/Debangan-MishraIIIT)<sup>1</sup>, [Sumit Kumar](https://github.com/Sumitkk10)<sup>1</sup>, [Arvindh Arun](https://github.com/arvindh75)<sup>1,2</sup>, [Shashwat Goel](https://github.com/shash42)<sup>†1,3,4</sup>, [Ponnurangam Kumaraguru](https://precog.iiit.ac.in/)<sup>1</sup>
+
+<sup>1</sup>IIIT Hyderabad • <sup>2</sup>Institute for AI, University of Stuttgart • <sup>3</sup>Max Planck Institute for Intelligent Systems • <sup>4</sup>ELLIS Institute Tübingen
+
+<sup>*</sup>Equal contribution. <sup>†</sup>Equal advising.
+
+---
+
 ## Directory Structure
 
 - `attacks/`: Contains attack methods that are applied on the graph.
@@ -124,3 +142,16 @@ options:
 For the full list of options and their descriptions, run:
 
     python main.py --help
+
+### Citation
+```bibtex
+@misc{kolipaka2024cognacshotforgetbad,
+     title={A Cognac shot to forget bad memories: Corrective Unlearning in GNNs}, 
+     author={Varshita Kolipaka and Akshit Sinha and Debangan Mishra and Sumit Kumar and Arvindh Arun and Shashwat Goel and Ponnurangam Kumaraguru},
+     year={2024},
+     eprint={2412.00789},
+     archivePrefix={arXiv},
+     primaryClass={cs.LG},
+     url={https://arxiv.org/abs/2412.00789}, 
+}
+```
