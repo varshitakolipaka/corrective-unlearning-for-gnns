@@ -20,5 +20,37 @@
     "Computers": {
         "class1": 0,
         "class2": 6
+    },
+    "Roman-empire": {
+        "class1": 3,
+        "class2": 4
+    },
+    "Amazon-ratings": {
+        "class1": 3,
+        "class2": 4
+    },
+    "chameleon": {
+        "class1": 0,
+        "class2": 1
+    },
+    "DBLP": {
+        "class1": 2,
+        "class2": 3
+    },
+    "Physics": {
+        "class1": 3,
+        "class2": 4
+    },
+    "Cora_p": {
+        "class1": 2,
+        "class2": 4
+    },
+    "Citeseer_p": {
+        "class1": 1,
+        "class2": 4
+    },
+    "PubMed": {
+        "class1": 1,
+        "class2": 2
     }
 }

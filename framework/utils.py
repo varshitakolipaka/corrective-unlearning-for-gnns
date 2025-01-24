@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from torch_geometric.utils import k_hop_subgraph
 import os
-from torch_geometric.datasets import CitationFull, Coauthor, Amazon, Planetoid, Reddit2, Flickr, Twitch
+from torch_geometric.datasets import CitationFull, Coauthor, Amazon, Planetoid, Reddit2, Flickr, Twitch, HeterophilousGraphDataset, WikipediaNetwork
 import torch_geometric.transforms as T
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -53,6 +53,10 @@ def get_original_data(d):
         dataset = Flickr(os.path.join(data_dir, d), transform=T.NormalizeFeatures())
     elif d in ['Twitch']:
         dataset = Twitch(os.path.join(data_dir, d), "EN", transform=T.NormalizeFeatures())
+    elif d in ['Roman-empire', 'Amazon-ratings']:
+        dataset = HeterophilousGraphDataset(root=os.path.join(data_dir, d), name=d, transform=T.NormalizeFeatures())
+    elif d in ['chameleon', 'squirrel']:
+        dataset = WikipediaNetwork(root=os.path.join(data_dir, d), name=d, transform=T.NormalizeFeatures())
     else:
         raise NotImplementedError(f"{d} not supported.")
     data = dataset[0]

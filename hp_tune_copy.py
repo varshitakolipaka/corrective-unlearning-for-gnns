@@ -30,6 +30,8 @@ with open("classes_to_poison.json", "r") as f:
 
 with open("model_seeds.json") as f:
     model_seeds = json.load(f)
+    # make a defaultdict
+    model_seeds = defaultdict(lambda: 0, model_seeds)
 
 def train(load=False):
     if load:
@@ -393,7 +395,7 @@ hp_tuning_params_dict = {
         "train_lr": (1e-5, 1e-1, "log"),
         "weight_decay": (1e-5, 1e-1, "log"),
         "training_epochs": (range(500, 1000, 50), "categorical"),
-        "heads": ([1, 2, 4, 8], "categorical"),
+        # "heads": ([1, 2, 4, 8], "categorical"),
     },
 }
 
@@ -553,7 +555,7 @@ if __name__ == "__main__":
         # study_name=f"{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{args.unlearning_model}_{args.random_seed}_{class_dataset_dict[args.dataset]['class1']}_{class_dataset_dict[args.dataset]['class2']}",
         study_name=f"{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}",
         load_if_exists=True,
-        storage=f"sqlite:///hp_tuning/new/{args.db_name}.db",
+        storage=f"sqlite:///hp_tuning/base_gnn/{args.db_name}.db",
     )
 
     print("==OPTIMIZING==")

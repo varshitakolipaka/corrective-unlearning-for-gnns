@@ -74,7 +74,7 @@ class GATDelete(GAT):
         super().__init__(in_dim, hidden_dim, out_dim)
         self.deletion1 = DeletionLayer(hidden_dim, mask_1hop)
         self.deletion2 = DeletionLayer(hidden_dim, mask_2hop)
-        self.deletion3 = DeletionLayer(out_dim, mask_3hop)
+        self.deletion3 = DeletionLayer(hidden_dim, mask_3hop)
 
         self.conv1.requires_grad = False
         self.conv2.requires_grad = False

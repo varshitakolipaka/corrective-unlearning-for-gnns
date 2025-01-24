@@ -30,9 +30,12 @@ with open("classes_to_poison.json", "r") as f:
 
 with open("model_seeds.json") as f:
     model_seeds = json.load(f)
+    # convert to defaultdict
+    model_seeds = defaultdict(lambda: 0, model_seeds)
 
 def train(load=False):
     if load:
+        print("==LOADING==")
         clean_data = utils.get_original_data(args.dataset)
         # utils.train_test_split(
         #     clean_data, args.random_seed, args.train_ratio, args.val_ratio
@@ -446,7 +449,6 @@ def objective(trial, model, data):
 
     # We want to minimize misclassification rate and maximize accuracy
     return obj
-
 
 if __name__ == "__main__":
     print("\n\n\n")

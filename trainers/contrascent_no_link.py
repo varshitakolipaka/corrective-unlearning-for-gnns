@@ -1,3 +1,4 @@
+import json
 import os, math
 import copy
 from pprint import pprint
@@ -125,25 +126,8 @@ def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test",
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-class_dataset_dict = {
-    "Cora": {
-        "class1": 5,
-        "class2": 63,
-    },
-    "PubMed": {
-        "class1": 2,
-        "class2": 1,
-    },
-    "Amazon": {
-        "class1": 3,
-        "class2": 4,
-    },
-    "CS": {
-        "class1": 3,
-        "class2": 12,
-    },
-}
-
+with open("classes_to_poison.json", "r") as f:
+    class_dataset_dict = json.load(f)
 
 def time_it(func):
     def wrapper(*args, **kwargs):

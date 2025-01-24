@@ -1,0 +1,44 @@
+{
+    "Computers": {
+        "gcn": {
+            "train_lr": 0.010615023051907105,
+            "weight_decay": 2.5053581973852002e-05,
+            "training_epochs": 800
+        }
+    },
+    "DBLP": {
+        "gcn": {
+            "train_lr": 0.0013419633220971804,
+            "weight_decay": 0.000555679895313139,
+            "training_epochs": 800
+        }
+    },
+    "Physics": {
+        "gcn": {
+            "train_lr": 0.0025369953854535126,
+            "weight_decay": 5.441174578296056e-05,
+            "training_epochs": 500
+        }
+    },
+    "Citeseer_p": {
+        "gcn": {
+            "train_lr": 0.00024920385950620626,
+            "weight_decay": 0.0011556082977219632,
+            "training_epochs": 950
+        }
+    },
+    "Cora_p": {
+        "gcn": {
+            "train_lr": 0.000561851696005171,
+            "weight_decay": 0.0009269487009548595,
+            "training_epochs": 800
+        }
+    },
+    "PubMed": {
+        "gcn": {
+            "train_lr": 0.042838593495524234,
+            "weight_decay": 2.9647171883060176e-05,
+            "training_epochs": 900
+        }
+    }
+}

@@ -1,7 +1,7 @@
 import os
 import argparse
 
-def get_script(dataset, unlearning_model, attack, seed, cf=1.0, df_size=0.5, db_name=None, log_name='default', gnn='gcn', linked=False):    
+def get_script(dataset, unlearning_model, attack, seed, cf=1.0, df_size=0.5, db_name=None, log_name='default', gnn='gcn', linked=False, data_dir='/scratch'):    
     dataset_to_df = {
         'Amazon': 10000,
         'Cora': 750,
@@ -17,15 +17,15 @@ def get_script(dataset, unlearning_model, attack, seed, cf=1.0, df_size=0.5, db_
         link_str = "--linked"
     
     if attack == 'label':
-        return f"python main.py --df_size 0.5 --dataset {dataset} --unlearning_model {unlearning_model} --attack_type label --random_seed {seed} --gnn {gnn}  --data_dir /scratch/akshit.sinha/data3 {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"   
+        return f"python main.py --df_size 0.5 --dataset {dataset} --unlearning_model {unlearning_model} --attack_type label --random_seed {seed} --gnn {gnn}  --data_dir {data_dir} {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"   
     if attack == 'trigger':
-        return f"python main.py --df_size {df_size} --dataset {dataset} --unlearning_model {unlearning_model} --attack_type trigger --random_seed {seed} --gnn {gnn}  --data_dir /scratch/akshit.sinha/data3 {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"
+        return f"python main.py --df_size {df_size} --dataset {dataset} --unlearning_model {unlearning_model} --attack_type trigger --random_seed {seed} --gnn {gnn}  --data_dir {data_dir} {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"
     
     if attack == 'random':
-        return f"python main.py --df_size {df_size} --dataset {dataset} --unlearning_model {unlearning_model} --attack_type random --random_seed {seed} --gnn {gnn}  --data_dir /scratch/akshit.sinha/data3 {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"
+        return f"python main.py --df_size {df_size} --dataset {dataset} --unlearning_model {unlearning_model} --attack_type random --random_seed {seed} --gnn {gnn}  --data_dir {data_dir} {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"
 
     if attack == 'edge':
-        return f"python main.py --df_size {dataset_to_df[dataset]} --dataset {dataset} --unlearning_model {unlearning_model} --attack_type edge --request edge --random_seed {seed} --gnn {gnn} --data_dir /scratch/akshit.sinha/data3 {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"
+        return f"python main.py --df_size {dataset_to_df[dataset]} --dataset {dataset} --unlearning_model {unlearning_model} --attack_type edge --request edge --random_seed {seed} --gnn {gnn} --data_dir {data_dir} {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"
     
 if __name__ == "__main__":
 
@@ -40,6 +40,7 @@ if __name__ == "__main__":
     parser.add_argument('--log_name', type=str, default='default', help='Log name')
     parser.add_argument('--gnn', type=str, default='gcn', help='GNN model to use')
     parser.add_argument('--linked', action='store_true', help='Run HP tuning for linked model')
+    parser.add_argument('--data_dir', type=str, default='/scratch', help='Directory containing the data')
     
     parser.add_argument('--contra_2', action='store_true', help='Run HP tuning for contra_2 model')
     parser.add_argument('--contrastive', action='store_true', help='Run HP tuning for contra_2 model')
@@ -56,6 +57,7 @@ if __name__ == "__main__":
     parser.add_argument('--scrub_no_kl', action='store_true', help='Run HP tuning for yaum model')
     parser.add_argument('--scrub_no_kl_2', action='store_true', help='Run HP tuning for yaum model')
     parser.add_argument('--scrub_no_kl_combined', action='store_true', help='Run HP tuning for yaum model')
+    
 
     args = parser.parse_args()
     
@@ -100,6 +102,6 @@ if __name__ == "__main__":
             for unlearning_model in unlearning_models:
                 for attack in attacks:
                     for cf in cfs:
-                        script = get_script(dataset, unlearning_model, attack, seed, cf, df_size=args.df_size, db_name=args.db_name, log_name=args.log_name, gnn=args.gnn, linked=args.linked)
+                        script = get_script(dataset, unlearning_model, attack, seed, cf, df_size=args.df_size, db_name=args.db_name, log_name=args.log_name, gnn=args.gnn, linked=args.linked, data_dir=args.data_dir)
                         # print(script)
                         os.system(script)

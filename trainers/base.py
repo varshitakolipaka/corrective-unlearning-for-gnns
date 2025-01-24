@@ -66,7 +66,7 @@ class Trainer:
         self.unlearning_time = 0
         self.best_model_time = 0
 
-        self.TIME_THRESHOLD = 7.5 # 3 seconds
+        self.TIME_THRESHOLD = 4 # 3 seconds
         
         self.is_trigg_val = False
 

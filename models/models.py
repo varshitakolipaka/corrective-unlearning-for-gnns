@@ -22,6 +22,15 @@ class GCN(nn.Module):
             return x2
         return x3
 
+    def get_last_layer_emb(self, x, edge_index):
+        x1 = self.conv1(x, edge_index)
+        x1 = F.relu(x1)
+        x2 = self.conv2(x1, edge_index)
+        x2 = F.relu(x2)
+        x3 = self.conv3(x2, edge_index)
+        x3 = F.relu(x3)
+        return x3
+
     def decode(self, z, pos_edge_index, neg_edge_index=None):
         if neg_edge_index is not None:
             edge_index = torch.cat([pos_edge_index, neg_edge_index], dim=-1)
