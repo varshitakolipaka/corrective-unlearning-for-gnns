@@ -20,6 +20,8 @@ if __name__=="__main__":
     parser.add_argument('--dataset', type=str, required=True, help='Dataset name')
     parser.add_argument('--df_size', type=float, default=0.5, help='Size of the dataset fraction')
     parser.add_argument('--data_dir', type=str, default='/scratch/akshit.sinha/data', help='Directory containing the data')
+    parser.add_argument('--attack_type', type=str, default='label', help='Type of attack')
+
     
     args = parser.parse_args()
     
@@ -32,12 +34,25 @@ if __name__=="__main__":
         'gif',
         'yaum',
         'cacdc',
+        'contra_2'
     ]
+    
+    df_sizes_for_edge = {
+        'Computers': 4000,
+        'Physics': 25000,
+        'DBLP': 6000,
+        'Cora_p': 1750,
+        'Citeseer_p': 1500,
+        'PubMed': 30000
+    }
+    
+    if args.attack_type == 'edge':
+        args.df_size = df_sizes_for_edge[args.dataset]
     
     methods = [f'--{method}' for method in methods]
 
     for cf in corrective_fractions:
-        cmd = f"python run_hp_tune.py --dataset {args.dataset} --df_size {args.df_size} --random_seed {start_seed} --data_dir {args.data_dir} --attack_type label"
+        cmd = f"python run_hp_tune.py --dataset {args.dataset} --df_size {args.df_size} --random_seed {start_seed} --data_dir {args.data_dir} --attack_type {args.attack_type}"
         
         if cf != 1:
             db_name = f"{db_name_prefix}_{cf}"
@@ -55,7 +70,7 @@ if __name__=="__main__":
         
         ####
         
-        cmd = f"python eval_script.py --dataset {args.dataset} --df_size {args.df_size} --start_seed {start_seed} --end_seed {end_seed} --data_dir {args.data_dir} --db_name {db_name} --log_name {log_name} --gnn gcn --cf {cf}"
+        cmd = f"python eval_script.py --dataset {args.dataset} --df_size {args.df_size} --start_seed {start_seed} --end_seed {end_seed} --data_dir {args.data_dir} --db_name {db_name} --log_name {log_name} --gnn gcn --cf {cf} --attack_type {args.attack_type}"
         
         for method in methods:
             cmd += f" {method}"

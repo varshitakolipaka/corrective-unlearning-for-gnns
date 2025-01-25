@@ -53,7 +53,7 @@ def get_original_data(d):
         dataset = Flickr(os.path.join(data_dir, d), transform=T.NormalizeFeatures())
     elif d in ['Twitch']:
         dataset = Twitch(os.path.join(data_dir, d), "EN", transform=T.NormalizeFeatures())
-    elif d in ['Roman-empire', 'Amazon-ratings']:
+    elif d in ['Roman-empire', 'Amazon-ratings', 'Questions']:
         dataset = HeterophilousGraphDataset(root=os.path.join(data_dir, d), name=d, transform=T.NormalizeFeatures())
     elif d in ['chameleon', 'squirrel']:
         dataset = WikipediaNetwork(root=os.path.join(data_dir, d), name=d, transform=T.NormalizeFeatures())

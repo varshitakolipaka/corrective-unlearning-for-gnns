@@ -1,7 +1,7 @@
 #!/bin/bash
 
-python train_gnn_pipeline.py --dataset DBLP
-python train_gnn_pipeline.py --dataset Physics
-python train_gnn_pipeline.py --dataset Citeseer_p
-python train_gnn_pipeline.py --dataset Cora_p
-python train_gnn_pipeline.py --dataset PubMed
+python script_for_hp_tuning.py --dataset DBLP
+python script_for_hp_tuning.py --dataset Physics
+python script_for_hp_tuning.py --dataset Citeseer_p
+python script_for_hp_tuning.py --dataset Cora_p
+

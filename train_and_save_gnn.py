@@ -52,7 +52,12 @@ def train():    # dataset
         clean_model.parameters(), lr=args.train_lr, weight_decay=args.weight_decay
     )
     clean_trainer = Trainer(clean_model, clean_data, optimizer, args)
-    clean_trainer.train()
+    
+    if args.train_oracle:
+        clean_trainer.train()
+    else:
+        print("Not training oracle")
+        return clean_data
 
     if args.attack_type != "trigger":
         print("ACC__ : ", clean_trainer.evaluate())
@@ -98,6 +103,7 @@ def poison(clean_data=None):
         )
         poisoned_trainer = Trainer(poisoned_model, poisoned_data, optimizer, args)
         poisoned_trainer.evaluate()
+        
 
         forg, util, forget_f1, util_f1 = poisoned_trainer.get_score(
             args.attack_type,
@@ -164,18 +170,6 @@ def poison(clean_data=None):
     poisoned_trainer.train()
 
     # save the poisoned data and model and indices to np file
-    os.makedirs(args.data_dir, exist_ok=True)
-
-    torch.save(
-        poisoned_model,
-        f"{args.data_dir}/{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_poisoned_model.pt",
-    )
-
-    torch.save(
-        poisoned_data,
-        f"{args.data_dir}/{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_poisoned_data.pt",
-    )
-
     forg, util, forget_f1, util_f1 = poisoned_trainer.get_score(
         args.attack_type,
         class1=class_dataset_dict[args.dataset]["class1"],
@@ -185,6 +179,26 @@ def poison(clean_data=None):
     print(
         f"==Poisoned Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
     )
+    
+    # ask the user if they want to save the model
+    save_model = input("Do you want to save the model? (y/n): ")
+    
+    if save_model == "y":
+
+        os.makedirs(args.data_dir, exist_ok=True)
+
+        torch.save(
+            poisoned_model,
+            f"{args.data_dir}/{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_poisoned_model.pt",
+        )
+
+        torch.save(
+            poisoned_data,
+            f"{args.data_dir}/{args.dataset}_{args.attack_type}_{args.df_size}_{model_seeds[args.dataset]}_poisoned_data.pt",
+        )
+    else:
+        print("Model not saved")
+
 
     # print(f"PSR: {poisoned_trainer.calculate_PSR()}")
     return poisoned_data, poisoned_indices, poisoned_model
@@ -202,6 +216,5 @@ if __name__ == "__main__":
                 for key, value in best_params.items():
                     setattr(args, key, value)
         
-
     clean_data = train()
     poisoned_data, poisoned_indices, poisoned_model = poison(clean_data)

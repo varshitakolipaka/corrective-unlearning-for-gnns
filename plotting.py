@@ -99,7 +99,7 @@ def plot_forget_scores(df, folder):
         
         return cols
     
-    baselines = ['utu', 'scrub', 'megu', 'gif', 'gnndelete', 'yaum']
+    baselines = ['utu', 'scrub', 'megu', 'gif', 'gnndelete', 'yaum', 'contra_2']
     
     # add a column to indicate if the method is a baseline
     df['is_baseline'] = df['method'].apply(lambda x: x in baselines)

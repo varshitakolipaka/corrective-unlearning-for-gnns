@@ -71,6 +71,10 @@ def edge_attack_specific_nodes(data, epsilon, seed, class1=None, class2=None):
     if(epsilon<1):
         total_possible_edges = len(class1_indices) * len(class2_indices)
         epsilon = min(int(epsilon * total_possible_edges), total_possible_edges)
+    
+    epsilon = int(epsilon)
+        
+    print(f"Adding {epsilon} edges between class {class1} and class {class2}")
 
     # Set of existing edges
     existing_edges = set((min(n1, n2), max(n1, n2)) for n1, n2 in data.edge_index.t().tolist())
