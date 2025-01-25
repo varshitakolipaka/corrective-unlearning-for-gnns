@@ -15,7 +15,7 @@ def parse_args():
     parser.add_argument('--train_ratio', type=float, default=0.6, help='train ratio')
     parser.add_argument('--val_ratio', type=float, default=0.2, help='train ratio')
     parser.add_argument('--attack_type', type=str, default='label', help='attack type', choices=["label", "edge", "random", "trigger", 'label_strong', 'nettack'])
-    parser.add_argument('--unlearning_model', type=str, default='scrub', help='unlearning method', choices=["original", "gradient_ascent", "gnndelete", "gnndelete_ni", "gif", "utu", "contrastive", "retrain", "scrub", "megu", "contra_2", "ssd", "grub", "yaum", 'contrascent', 'cacdc', 'scrub_no_kl_combined', 'scrub_no_kl', 'scrub_no_kl_2'])
+    parser.add_argument('--unlearning_model', type=str, default='scrub', help='unlearning method', choices=["original", "gradient_ascent", "gnndelete", "gnndelete_ni", "gif", "utu", "contrastive", "retrain", "finetune", "scrub", "megu", "contra_2", "ssd", "grub", "yaum", 'contrascent', 'cacdc', 'scrub_no_kl_combined', 'scrub_no_kl', 'scrub_no_kl_2'])
     parser.add_argument('--gnn', type=str, default='gcn', help='GNN architecture', choices=['gcn', 'gat', 'gin'])
     # parser.add_argument('--in_dim', type=int, default=128, help='input dimension')
     parser.add_argument('--hidden_dim', type=int, default=64, help='hidden dimension')
@@ -27,7 +27,7 @@ def parse_args():
     # Data
     parser.add_argument('--data_dir', type=str, default='./data', help='data dir')
     parser.add_argument('--db_name', type=str, default='hp_tuning', help='db name')
-    
+
     # parser.add_argument('--df', type=str, default='in', help='Df set to use')
     # parser.add_argument('--df_idx', type=str, default=None, help='indices of data to be deleted')
     parser.add_argument('--df_size', type=float, default=0.5, help='Forgetting Fraction')
@@ -48,10 +48,10 @@ def parse_args():
     parser.add_argument('--unlearn_lr', type=float, default=0.015, help='unlearn learning rate')
     parser.add_argument('--weight_decay', type=float, default=0.000011020697848386563, help='weight decay')
     parser.add_argument('--optimizer', type=str, default='Adam', help='optimizer to use')
-    
+
     # GAT Heads
     parser.add_argument('--heads', type=int, default=8, help='number of heads for GATConv')
-    
+
     parser.add_argument('--training_epochs', type=int, default=700, help='number of epochs to train')
     parser.add_argument('--valid_freq', type=int, default=30, help='# of epochs to do validation')
     parser.add_argument('--checkpoint_dir', type=str, default='./checkpoint', help='checkpoint folder')
@@ -97,7 +97,7 @@ def parse_args():
     parser.add_argument('--scrubAlpha', type=float, default=0, help='KL from og_model constant for SCRUB, higher incentivizes closeness to ogmodel')
     parser.add_argument('--msteps', type=int, default=25, help='Maximization steps on forget set for SCRUB')
     parser.add_argument('--ascent_lr', type=float, default=0.0025, help='Learning rate for gradient ascent steps')
-    parser.add_argument('--descent_lr', type=float, default=0.015, help='Learning rate for gradient descent steps')  
+    parser.add_argument('--descent_lr', type=float, default=0.015, help='Learning rate for gradient descent steps')
 
 
     # contrastive
@@ -115,20 +115,20 @@ def parse_args():
     parser.add_argument('--kappa', type=float, default=0.01)
     parser.add_argument('--alpha1', type=float, default=0.8)
     parser.add_argument('--alpha2', type=float, default=0.5)
-    
+
     # SSD
     parser.add_argument('--SSDdampening', type=float, default=10, help='SSD: lambda aka dampening constant, lower leads to more forgetting')
     parser.add_argument('--SSDselectwt', type=float, default=1, help='SSD: alpha aka selection weight, lower leads to more forgetting')
-    
+
     # UTILITIES
     parser.add_argument('--embs_all', action='store_true', help='whether to plot embeddings in embs.py')
     parser.add_argument('--embs_unlearn', action='store_true', help='whether to plot embeddings in embs.py')
-    
+
     # CORRECTIVE UNLEARNING
     parser.add_argument('--corrective_frac', type=float, default=1, help='fraction of nodes to sample for corrective unlearning (by default all nodes)')
-    
+
     parser.add_argument('--log_name', type=str, default='default', help='log name')
-    
+
     parser.add_argument('--linked', action='store_true', help='whether to use linked model')
     
     parser.add_argument('--train_oracle', action='store_true', help='whether to train oracle model', default=False)

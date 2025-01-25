@@ -29,6 +29,7 @@ from trainers.scrub_no_kl_combined import ScrubTrainer2
 from trainers.ssd import SSDTrainer
 from trainers.utu import UtUTrainer
 from trainers.retrain import RetrainTrainer
+from trainers.finetune import FinetuneTrainer
 from trainers.megu import MeguTrainer
 from trainers.grub import GrubTrainer
 from trainers.yaum import YAUMTrainer
@@ -214,6 +215,7 @@ def get_trainer(args, poisoned_model, poisoned_data, optimizer_unlearn) -> Train
         "contrastive": ContrastiveUnlearnTrainer,
         'contra_2': ContrastiveUnlearnTrainer_NEW,
         "retrain": RetrainTrainer,
+        "finetune": FinetuneTrainer,
         "scrub": ScrubTrainer,
         "megu": MeguTrainer,
         "ssd": SSDTrainer,
@@ -273,18 +275,18 @@ def prints_stats(data):
 def rotate_embeddings(embeddings, angle):
     """
     Rotates the 2D embeddings by a specified angle.
-    
+
     Args:
     embeddings (numpy.ndarray): The 2D embeddings to be rotated.
     angle (float): The angle (in degrees) by which to rotate the embeddings.
-    
+
     Returns:
     numpy.ndarray: The rotated embeddings.
     """
     theta = np.radians(angle)
-    rotation_matrix = np.array([[np.cos(theta), -np.sin(theta)], 
+    rotation_matrix = np.array([[np.cos(theta), -np.sin(theta)],
                                 [np.sin(theta), np.cos(theta)]])
-    
+
     return np.dot(embeddings, rotation_matrix)
 
 def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test", name=""):
@@ -344,32 +346,32 @@ def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test",
     for i, cls in enumerate(other_classes):
         class_mask = (labels == cls)
         plt.scatter(
-            pre_embeddings[class_mask, 0], 
-            pre_embeddings[class_mask, 1], 
-            color=color_palette[i], 
+            pre_embeddings[class_mask, 0],
+            pre_embeddings[class_mask, 1],
+            color=color_palette[i],
             alpha=0.25,  # Slightly lower opacity for non-poisoned classes
             s=50
         )
 
     # Plot class1 (poisoned class)
     plt.scatter(
-        pre_embeddings[class1_mask, 0], 
-        pre_embeddings[class1_mask, 1], 
-        color='blue', 
-        alpha=0.6, 
-        s=120, 
-        edgecolors='black', 
+        pre_embeddings[class1_mask, 0],
+        pre_embeddings[class1_mask, 1],
+        color='blue',
+        alpha=0.6,
+        s=120,
+        edgecolors='black',
         linewidths=2  # Thicker borders
     )
 
     # Plot class2 (poisoned class)
     plt.scatter(
-        pre_embeddings[class2_mask, 0], 
-        pre_embeddings[class2_mask, 1], 
-        color='red', 
-        alpha=0.6, 
-        s=120, 
-        edgecolors='black', 
+        pre_embeddings[class2_mask, 0],
+        pre_embeddings[class2_mask, 1],
+        color='red',
+        alpha=0.6,
+        s=120,
+        edgecolors='black',
         linewidths=2  # Thicker borders
     )
 
@@ -454,24 +456,24 @@ def plot_poisoned_classes_only(args, model, data, class1, class2, is_dr=False, m
 
     # Plot class1 (poisoned class) embeddings
     plt.scatter(
-        poisoned_embeddings[:sum(class1_mask), 0], 
-        poisoned_embeddings[:sum(class1_mask), 1], 
-        color='blue', 
-        alpha=0.7, 
-        s=120, 
-        edgecolors='black', 
+        poisoned_embeddings[:sum(class1_mask), 0],
+        poisoned_embeddings[:sum(class1_mask), 1],
+        color='blue',
+        alpha=0.7,
+        s=120,
+        edgecolors='black',
         linewidths=2,  # Thicker borders
         label=f'Class {class1}'
     )
 
     # Plot class2 (poisoned class) embeddings
     plt.scatter(
-        poisoned_embeddings[sum(class1_mask):, 0], 
-        poisoned_embeddings[sum(class1_mask):, 1], 
-        color='red', 
-        alpha=0.7, 
-        s=120, 
-        edgecolors='black', 
+        poisoned_embeddings[sum(class1_mask):, 0],
+        poisoned_embeddings[sum(class1_mask):, 1],
+        color='red',
+        alpha=0.7,
+        s=120,
+        edgecolors='black',
         linewidths=2,  # Thicker borders
         label=f'Class {class2}'
     )
@@ -510,10 +512,10 @@ def sample_poison_data(poisoned_indices, frac):
 def sample_poison_data_edges(data, frac):
     assert 0.0 <= frac <= 1.0, "frac must be between 0 and 1"
     poisoned_indices = data.poisoned_edge_indices.cpu().numpy()
-    
+
     total_edges_poisoned = len(poisoned_indices) // 2
     num_to_sample = int(frac * total_edges_poisoned)
-    
+
     edge_dict = {}
     unique_edges = []
     cnt = 0
@@ -526,22 +528,22 @@ def sample_poison_data_edges(data, frac):
 
         if reverse_edge in edge_dict:
             cnt += 1
-        
+
         edge_dict[edge] = i
-    
+
     sampled_edges = torch.tensor(np.random.choice(unique_edges, num_to_sample, replace=False))
-    
+
     # print("hello")
     # print(len(sampled_edges))
     # for i in sampled_edges:
     #     print((data.edge_index[0][i], data.edge_index[1][i]))
     # print((data.edge_index[1][sampled_edges[i]], data.edge_index[0][sampled_edges[i]]) for i in range(len(sampled_edges)))
-    
 
-    reverse_edges = [edge_dict[(data.edge_index[1][i].item(), data.edge_index[0][i].item())] 
+
+    reverse_edges = [edge_dict[(data.edge_index[1][i].item(), data.edge_index[0][i].item())]
                      for i in sampled_edges]
-    
-    sampled_edges = torch.cat((sampled_edges, torch.tensor(reverse_edges)))    
+
+    sampled_edges = torch.cat((sampled_edges, torch.tensor(reverse_edges)))
     # get the unique endpoints of sampled edges as poisoned nodes in tensor
 
     sampled_nodes = torch.unique(data.edge_index[:, sampled_edges].flatten())
