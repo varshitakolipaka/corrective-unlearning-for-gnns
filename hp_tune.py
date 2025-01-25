@@ -515,12 +515,12 @@ if __name__ == "__main__":
     objective_func = partial(objective, model=model, data=poisoned_data)
 
     print("==HYPERPARAMETER TUNING==")
-    
+
     # optuna.delete_study(
     #     study_name=f"{args.gnn}_{args.dataset}_{args.attack_type}_{args.df_size}_{args.unlearning_model}_{args.random_seed}_{class_dataset_dict[args.dataset]['class1']}_{class_dataset_dict[args.dataset]['class2']}",
     #     storage=f"sqlite:///hp_tuning/new/{args.db_name}.db",
     # )
-    
+
     # Create a study with TPE sampler
     study = optuna.create_study(
         sampler=TPESampler(seed=42),
@@ -529,7 +529,7 @@ if __name__ == "__main__":
         load_if_exists=True,
         storage=f"sqlite:///hp_tuning/new/{args.db_name}.db",
     )
-    
+
 
 
     print("==OPTIMIZING==")
