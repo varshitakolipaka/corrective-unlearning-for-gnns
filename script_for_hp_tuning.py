@@ -34,7 +34,8 @@ if __name__=="__main__":
         'gif',
         'yaum',
         'cacdc',
-        'contra_2'
+        'contra_2',
+        'finetune',
     ]
     
     df_sizes_for_edge = {
@@ -43,7 +44,10 @@ if __name__=="__main__":
         'DBLP': 6000,
         'Cora_p': 1750,
         'Citeseer_p': 1500,
-        'PubMed': 30000
+        'PubMed': 30000,
+        'Cora': 1500,
+        'CS': 3000,
+        'Amazon': 12000,
     }
     
     if args.attack_type == 'edge':
@@ -79,4 +83,4 @@ if __name__=="__main__":
         
         os.system(cmd)
     
-        os.system(f"sh get_stats.sh logs/{log_name}")
+        os.system(f"sh get_stats.sh logs/{log_name}/{args.dataset}/")

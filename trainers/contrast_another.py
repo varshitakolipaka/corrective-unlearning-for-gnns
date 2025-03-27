@@ -4,6 +4,7 @@ import copy
 from pprint import pprint
 import time
 import scipy.sparse as sp
+from torch.nn.utils.rnn import pad_sequence
 
 # import wandb
 import numpy as np
@@ -377,26 +378,48 @@ class ContrastiveUnlearnTrainer_NEW(Trainer):
                 list(self.subset_dict[idx.item()] - attacked_set) 
                 for idx in batch_indices
             ]
-            
-            # Max lengths can be computed once per loop iteration
+            batch_negative_samples = [list(attacked_set) for _ in range(batch_size)]
+
+            # Pad and create dense batches
             max_pos = max(len(s) for s in batch_positive_samples)
-            max_neg = len(attacked_list)  # Always fixed since attacked_set size won't change
+            max_neg = max(len(s) for s in batch_negative_samples)
 
-            # Preallocate memory for tensors
-            batch_pos = torch.zeros((batch_size, max_pos), dtype=torch.long)
-            batch_neg = torch.zeros((batch_size, max_neg), dtype=torch.long)
-            mask_pos = torch.zeros((batch_size, max_pos), dtype=torch.float32)
-            mask_neg = torch.ones((batch_size, max_neg), dtype=torch.float32)  # Fixed
+            batch_pos = torch.stack(
+                [
+                    torch.tensor(s + [0] * (max_pos - len(s)))
+                    for s in batch_positive_samples
+                ]
+            )
+            batch_neg = torch.stack(
+                [
+                    torch.tensor(s + [0] * (max_neg - len(s)))
+                    for s in batch_negative_samples
+                ]
+            )
 
-            for idx, pos_samples in enumerate(batch_positive_samples):
-                pos_len = len(pos_samples)
-                batch_pos[idx, :pos_len] = torch.tensor(pos_samples)
-                mask_pos[idx, :pos_len] = 1.0
+            mask_pos = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_pos - len(s)))
+                        for s in batch_positive_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
 
-            # Move everything to the correct device
-            device = self.embeddings.device
-            batch_pos, batch_neg = batch_pos.to(device), batch_neg.to(device)
-            mask_pos, mask_neg = mask_pos.to(device).unsqueeze(-1), mask_neg.to(device).unsqueeze(-1)
+            mask_neg = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_neg - len(s)))
+                        for s in batch_negative_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
 
             st_2 = time.time()
             try:
@@ -560,6 +583,47 @@ class ContrastiveUnlearnTrainer_NEW(Trainer):
         descent_optimizer = torch.optim.Adam(
             self.model.parameters(), lr=args.descent_lr
         )
+        
+        self.model.eval()
+        self.embeddings = self.model(
+                        self.data.x, self.data.edge_index
+                    )
+
+        sample_indices = torch.where(self.data.sample_mask)[0]
+        attacked_list = list(self.attacked_idx)
+        # attacked idx must be a list of nodes
+        loss = self.run_sage_batch()
+        contrastive_losses = {0: loss.item()}
+
+        avg_pos_dot = {}
+        avg_neg_dot = {}
+        # Extract anchor embeddings
+        anchor_embeds = self.embeddings[sample_indices]  # Shape: (N, D)
+
+        # Convert subset_dict values to sorted lists (ensuring tensor compatibility)
+        pos_embeds_list = [self.embeddings[list(self.subset_dict[sample.item()])] for sample in sample_indices]
+
+        # Pad to the maximum number of positive samples
+        pos_embeds = pad_sequence(pos_embeds_list, batch_first=True, padding_value=0)  # (N, P_max, D)
+
+        # Extract negative embeddings
+        neg_embeds = self.embeddings[attacked_list]  # Shape: (M, D)
+
+        # Compute dot products efficiently
+        pos_dot = torch.bmm(pos_embeds, anchor_embeds.unsqueeze(2)).squeeze(2)  # (N, P_max)
+        neg_dot = torch.mm(anchor_embeds, neg_embeds.T)  # (N, M)
+
+        # Compute means, ignoring padded values in pos_dot
+        pos_mask = pos_embeds.abs().sum(dim=-1) > 0  # Mask padded values
+        avg_pos_dot[0] = ((pos_dot * pos_mask).sum() / pos_mask.sum()).item()
+        avg_neg_dot[0] = neg_dot.mean().item()
+
+        print(
+            f"Average positive dot product before unlearning: {torch.mean(torch.tensor(pos_dot))}"
+        )
+        print(
+            f"Average negative dot product before unlearning: {torch.mean(torch.tensor(neg_dot))}"
+        )
 
         # attacked idx must be a list of nodes
         for epoch in trange(args.steps, desc="Unlearning"):
@@ -578,9 +642,15 @@ class ContrastiveUnlearnTrainer_NEW(Trainer):
                     #     pos_dist, neg_dist, margin=args.contrastive_margin
                     # )
                     loss = self.run_sage_batch()
+                    
+                    # if epoch not in contrastive_losses:
+                    #     contrastive_losses[epoch] = []
+                    # contrastive_losses[epoch].append(loss.item())
 
                     loss.backward()
                     optimizer.step()
+                    
+                    
                 else:
                     descent_optimizer.zero_grad()
 
@@ -606,6 +676,54 @@ class ContrastiveUnlearnTrainer_NEW(Trainer):
                     if cutoff:
                         self.load_best()
                         return
+            
+            contrastive_losses[int(epoch+1)] = loss.item()
+
+            self.model.eval()
+            self.embeddings = self.model(
+                self.data.x, self.data.edge_index[:, self.data.dr_mask]
+            )
+            
+            self.model.eval()
+            self.embeddings = self.model(self.data.x, self.data.edge_index[:, self.data.dr_mask])
+
+            # Extract anchor embeddings
+            anchor_embeds = self.embeddings[sample_indices]  # Shape: (N, D)
+
+            # Convert subset_dict values to sorted lists (ensuring tensor compatibility)
+            pos_embeds_list = [self.embeddings[list(self.subset_dict[sample.item()])] for sample in sample_indices]
+
+            # Pad to the maximum number of positive samples
+            pos_embeds = pad_sequence(pos_embeds_list, batch_first=True, padding_value=0)  # (N, P_max, D)
+
+            # Extract negative embeddings
+            neg_embeds = self.embeddings[attacked_list]  # Shape: (M, D)
+
+            # Compute dot products efficiently
+            pos_dot = torch.bmm(pos_embeds, anchor_embeds.unsqueeze(2)).squeeze(2)  # (N, P_max)
+            neg_dot = torch.mm(anchor_embeds, neg_embeds.T)  # (N, M)
+
+            # Compute means, ignoring padded values in pos_dot
+            pos_mask = pos_embeds.abs().sum(dim=-1) > 0  # Mask padded values
+            avg_pos_dot[epoch + 1] = ((pos_dot * pos_mask).sum() / pos_mask.sum()).item()
+            avg_neg_dot[epoch + 1] = neg_dot.mean().item()
+                    
+        # save dot products as json
+        os.makedirs("prods", exist_ok=True)
+        print(f"Average positive dot product after unlearning: {avg_pos_dot}")
+        print(f"Average negative dot product after unlearning: {avg_neg_dot}")
+        with open(
+            f"prods/dot_products_{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}.json",
+            "w",
+        ) as f:
+            print(f"Saving dot products to file")
+            json.dump({"pos":avg_pos_dot, "neg": avg_neg_dot}, f, indent=4)
+        
+        with open(
+            f"prods/contrastive_losses_{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}.json",
+            "w",
+        ) as f:
+            json.dump(contrastive_losses, f, indent=4)    
         
         # load best model
         self.load_best()

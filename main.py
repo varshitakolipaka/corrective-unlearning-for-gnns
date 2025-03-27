@@ -11,7 +11,7 @@ from trainers.base import Trainer
 from attacks.edge_attack import edge_attack_specific_nodes
 from attacks.label_flip import label_flip_attack
 from attacks.feature_attack import trigger_attack
-from attacks.nettack import nettack_attack
+# from attacks.nettack import nettack_attack
 import optuna
 from optuna.samplers import TPESampler
 from functools import partial
@@ -89,7 +89,7 @@ def train(load=False):
         #     class1=class_dataset_dict[args.dataset]["class1"],
         #     class2=class_dataset_dict[args.dataset]["class2"],
         #     is_dr=False,
-        #     name=f"clean_other",
+        #     name=f"clean",
         # )
 
         return clean_data
@@ -195,7 +195,7 @@ def poison(clean_data=None):
         #     class1=class_dataset_dict[args.dataset]["class1"],
         #     class2=class_dataset_dict[args.dataset]["class2"],
         #     is_dr=False,
-        #     name=f"poison_other",
+        #     name=f"poison",
         # )
 
         return poisoned_data, poisoned_indices, poisoned_model
@@ -229,14 +229,16 @@ def poison(clean_data=None):
             trigger_size=args.trigger_size,
         )
     if args.attack_type == "nettack":
-        poisoned_data, poisoned_node = nettack_attack(
-            clean_data,
-            epsilon=args.df_size,
-            seed=args.random_seed,
-            target_node=args.target_node
-        )
-        poisoned_indices = torch.tensor([poisoned_node])  # Track which node was attacked
+        # poisoned_data, poisoned_node = nettack_attack(
+        #     clean_data,
+        #     epsilon=args.df_size,
+        #     seed=args.random_seed,
+        #     target_node=args.target_node
+        # )
+        # poisoned_indices = torch.tensor([poisoned_node])  # Track which node was attacked
+        pass
 
+    exit()
 
     poisoned_data = poisoned_data.to(device)
 
@@ -369,9 +371,12 @@ if __name__ == "__main__":
 
     print(args.dataset, args.attack_type)
     clean_data = train(load=True)
-    # clean_data = train()
-    poisoned_data, poisoned_indices, poisoned_model = poison()
 
+    # clean_data = train()
+    poisoned_data, poisoned_indices, poisoned_model = poison(clean_data)
+
+    exit()
+    
     # load best params file
     with open("best_params.json", "r") as f:
         d = json.load(f)
@@ -402,8 +407,28 @@ if __name__ == "__main__":
     # set args
     for key, value in params.items():
         setattr(args, key, value)
+        
+    # utils.find_masks(
+    #     poisoned_data, poisoned_indices, args, attack_type=args.attack_type
+    # )
+    
+    # utils.plot_retain_forget_embeddings(
+    #     args,
+    #     poisoned_model,
+    #     poisoned_data,
+    #     is_dr=False,
+    #     name=f"Final Hidden Layer Representations of Retained and Forgotten Nodes Before Unlearning",
+    # )
 
     unlearnt_model = unlearn(poisoned_data, poisoned_indices, poisoned_model)
+    
+    # utils.plot_retain_forget_embeddings(
+    #     args,
+    #     unlearnt_model,
+    #     poisoned_data,
+    #     is_dr=True,
+    #     name=f"Final Hidden Layer Representations of Retained and Forgotten Nodes",
+    # )
 
     # utils.plot_embeddings(
     #     args,

@@ -12,7 +12,7 @@ import seaborn as sns
 from sklearn.manifold import TSNE
 from torch_geometric.utils import subgraph
 from scipy.spatial import ConvexHull
-
+import scienceplots
 from trainers.contrascent import ContrastiveAscentTrainer
 from trainers.contrascent_no_link import ContrastiveAscentNoLinkTrainer
 from trainers.contrast import ContrastiveUnlearnTrainer
@@ -292,6 +292,8 @@ def rotate_embeddings(embeddings, angle):
 def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test", name=""):
     # Set the model to evaluation mode
     model.eval()
+    
+    plt.style.use(['science', 'no-latex', 'scatter', 'grid'])
 
     # Forward pass: get embeddings
     with torch.no_grad():
@@ -302,7 +304,7 @@ def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test",
 
     # If embeddings have more than 2 dimensions, apply t-SNE
     if pre_embeddings.shape[1] > 2:
-        pre_embeddings = TSNE(n_components=2).fit_transform(pre_embeddings.cpu())
+        pre_embeddings = TSNE(n_components=2, perplexity=30).fit_transform(pre_embeddings.cpu())
         pre_embeddings = torch.tensor(pre_embeddings).to(device)
 
     # Get the mask (either test, train, or val)
@@ -331,16 +333,27 @@ def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test",
     unique_classes = torch.unique(labels).cpu().numpy()
     other_classes = [c for c in unique_classes if c != class1 and c != class2]
 
-    plt.figure(figsize=(8, 8), tight_layout=True)
-    sns.set(style="whitegrid")
+    plt.figure(figsize=(8, 8), tight_layout=True, dpi=600)
+    # sns.set(style="whitegrid")
 
-    plt.grid(True, linestyle='-', alpha=0.7)
+    # plt.grid(True, linestyle='-', alpha=0.7)
 
     # Convert labels to numpy for processing
     labels = labels.cpu().numpy()
 
     # Generate a color palette for all classes
-    color_palette = sns.color_palette("pastel", len(unique_classes))
+    color_palette = sns.color_palette("tab20c", len(unique_classes))
+
+    # # Plot class1 (poisoned class)
+    # plt.scatter(
+    #     pre_embeddings[class1_mask, 0],
+    #     pre_embeddings[class1_mask, 1],
+    #     color="#ff595e",  # Use the next color in the palette
+    #     alpha=0.9 if name != "poison" else 0.6,
+    #     s=100,
+    #     edgecolors='black',
+    #     linewidths=2  # Thicker borders
+    # )
 
     # Plot each class with its unique color (non-poisoned classes will have reduced opacity)
     for i, cls in enumerate(other_classes):
@@ -348,46 +361,131 @@ def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test",
         plt.scatter(
             pre_embeddings[class_mask, 0],
             pre_embeddings[class_mask, 1],
-            color=color_palette[i],
-            alpha=0.25,  # Slightly lower opacity for non-poisoned classes
-            s=50
+            color=color_palette[i + 1] if i+1 != 6 else color_palette[0],  # Use the next color in the palette
+            alpha=0.1,  # Slightly lower opacity for non-poisoned classes
+            s=50,
+            edgecolors='black',
+            linewidths=2
         )
-
-    # Plot class1 (poisoned class)
-    plt.scatter(
-        pre_embeddings[class1_mask, 0],
-        pre_embeddings[class1_mask, 1],
-        color='blue',
-        alpha=0.6,
-        s=120,
-        edgecolors='black',
-        linewidths=2  # Thicker borders
-    )
 
     # Plot class2 (poisoned class)
     plt.scatter(
         pre_embeddings[class2_mask, 0],
         pre_embeddings[class2_mask, 1],
-        color='red',
-        alpha=0.6,
-        s=120,
+        color="#1982c4",  # Use the next color in the palette
+        alpha=0.9 if name != "poison" else 0.6,
+        s=100,
+        edgecolors='black',
+        linewidths=2  # Thicker borders
+    )
+    
+    # Plot class1 (poisoned class)
+    plt.scatter(
+        pre_embeddings[class1_mask, 0],
+        pre_embeddings[class1_mask, 1],
+        color="#ff595e",  # Use the next color in the palette
+        alpha=0.9 if name != "poison" else 0.6,
+        s=100,
         edgecolors='black',
         linewidths=2  # Thicker borders
     )
 
     # Keep x-axis and y-axis ticks without labels and title
-    plt.xticks(ticks=plt.xticks()[0], labels=[''] * len(plt.xticks()[0]))  # Remove x-axis labels
-    plt.yticks(ticks=plt.yticks()[0], labels=[''] * len(plt.yticks()[0]))  # Remove y-axis labels
+    # plt.xticks(ticks=plt.xticks()[0], labels=[''] * len(plt.xticks()[0]))  # Remove x-axis labels
+    # plt.yticks(ticks=plt.yticks()[0], labels=[''] * len(plt.yticks()[0]))  # Remove y-axis labels
+    
     plt.title('')  # Remove title
     plt.gca().legend().set_visible(False)  # Remove legend
 
     # Ensure the grid is visible
-    plt.grid(True)
+    # plt.grid(True)
 
     # Save the plot
     os.makedirs("./plots", exist_ok=True)
-    plt.savefig(f"./plots/{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}_{name}_embeddings_clean.png", format='png', bbox_inches='tight')
-    plt.show()
+    plt.savefig(f"./plots/{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}_{name}_embeddings.svg", format='svg', bbox_inches='tight')    
+    plt.savefig(f"./plots/{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}_{name}_embeddings.png", format='png', bbox_inches='tight')    
+    plt.close()
+    
+def plot_retain_forget_embeddings(args, model, data, is_dr=True, mask="train", name=""):
+    # Set the model to evaluation
+    model.eval()
+    
+    # Forward pass: get embeddings
+    with torch.no_grad():
+        if is_dr:
+            pre_embeddings = model.get_last_layer_emb(data.x, data.edge_index[:, data.dr_mask])
+        else:
+            pre_embeddings = model.get_last_layer_emb(data.x, data.edge_index)
+            
+    # If embeddings have more than 2 dimensions, apply t-SNE
+    if pre_embeddings.shape[1] > 2:
+        print("Applying t-SNE to embeddings...")
+        pre_embeddings = TSNE(n_components=2).fit_transform(pre_embeddings.cpu())
+        pre_embeddings = torch.tensor(pre_embeddings).to(device)
+        
+    # Get the mask (either test, train, or val)
+    if mask == "test":
+        mask = data.test_mask
+    elif mask == "train":
+        mask = data.train_mask
+    else:
+        mask = data.val_mask
+    
+    if not hasattr(data, 'retain_mask'):
+        data.retain_mask = data.train_mask
+        
+    # calculate the indices of retained and poisoned nodes
+    retained_nodes = torch.where(data.retain_mask)[0]
+    poisoned_nodes = data.poisoned_nodes
+    
+    retain_embs = pre_embeddings[retained_nodes]
+    poison_embs = pre_embeddings[poisoned_nodes]
+    
+    # Convert embeddings to numpy for processing
+    retain_embs = retain_embs.cpu().numpy()
+    poison_embs = poison_embs.cpu().numpy()
+    
+    # Create the plot
+    plt.figure(figsize=(8, 8), tight_layout=True)
+    sns.set(style="whitegrid")
+    
+    color_palette = sns.color_palette("pastel", 2)
+    
+    # Plot retained nodes
+    plt.scatter(
+        retain_embs[:, 0],
+        retain_embs[:, 1],
+        color=color_palette[0],
+        alpha=0.7,
+        s=120,
+        edgecolors='black',
+        linewidths=2,
+        label='Retained Nodes'
+    )
+    
+    # Plot poisoned nodes
+    plt.scatter(
+        poison_embs[:, 0],
+        poison_embs[:, 1],
+        color=color_palette[1],
+        alpha=0.7,
+        s=120,
+        edgecolors='black',
+        linewidths=2,
+        label='Poisoned Nodes'
+    )
+    
+    # Keep x-axis and y-axis ticks without labels and title
+    plt.xticks(ticks=plt.xticks()[0], labels=[''] * len(plt.xticks()[0]))  # Remove x-axis labels
+    plt.yticks(ticks=plt.yticks()[0], labels=[''] * len(plt.yticks()[0]))  # Remove y-axis labels
+    
+    plt.title(name)  # Set the title
+    
+    
+    
+    # Save the plot
+    os.makedirs("./plots", exist_ok=True)
+    plt.savefig(f"./plots/{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}_embeddings_{args.unlearning_model}.png", format='png', bbox_inches='tight')
 
 def remove_outliers(data, threshold=1.0):
         # Calculate the convex hull of the data

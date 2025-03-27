@@ -65,6 +65,7 @@ if __name__ == "__main__":
     parser.add_argument('--scrub_no_kl', action='store_true', help='Run HP tuning for yaum model')
     parser.add_argument('--scrub_no_kl_2', action='store_true', help='Run HP tuning for yaum model')
     parser.add_argument('--scrub_no_kl_combined', action='store_true', help='Run HP tuning for yaum model')
+    parser.add_argument('--finetune', action='store_true', help='Run HP tuning for yaum model')
 
     args = parser.parse_args()
     
@@ -101,5 +102,7 @@ if __name__ == "__main__":
         unlearning_models.append('scrub_no_kl_2')
     if args.scrub_no_kl_combined:
         unlearning_models.append('scrub_no_kl_combined')
+    if args.finetune:
+        unlearning_models.append('finetune')
     
     run_hp_tuning(unlearning_models, args.df_size, args.random_seed, args.dataset, args.attack_type, args.data_dir, args.db_name, args.gnn, args.cf, args.log_name, linked=args.linked)

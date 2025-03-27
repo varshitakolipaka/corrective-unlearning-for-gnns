@@ -2,12 +2,7 @@ import os
 import argparse
 
 def get_script(dataset, unlearning_model, attack, seed, cf=1.0, df_size=0.5, db_name=None, log_name='default', gnn='gcn', linked=False, data_dir='/scratch'):    
-    dataset_to_df = {
-        'Amazon': 10000,
-        'Cora': 750,
-        'CS': 3000,
-    }
-    
+
     cf_str = ""
     if cf < 1.0:
         cf_str = f"--corrective_frac {cf}"
@@ -25,7 +20,7 @@ def get_script(dataset, unlearning_model, attack, seed, cf=1.0, df_size=0.5, db_
         return f"python main.py --df_size {df_size} --dataset {dataset} --unlearning_model {unlearning_model} --attack_type random --random_seed {seed} --gnn {gnn}  --data_dir {data_dir} {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"
 
     if attack == 'edge':
-        return f"python main.py --df_size {dataset_to_df[dataset]} --dataset {dataset} --unlearning_model {unlearning_model} --attack_type edge --request edge --random_seed {seed} --gnn {gnn} --data_dir {data_dir} {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"
+        return f"python main.py --df_size {df_size} --dataset {dataset} --unlearning_model {unlearning_model} --attack_type edge --request edge --random_seed {seed} --gnn {gnn} --data_dir {data_dir} {cf_str} --db_name {db_name} --log_name {log_name} {link_str}"
     
 if __name__ == "__main__":
 
@@ -57,7 +52,7 @@ if __name__ == "__main__":
     parser.add_argument('--scrub_no_kl', action='store_true', help='Run HP tuning for yaum model')
     parser.add_argument('--scrub_no_kl_2', action='store_true', help='Run HP tuning for yaum model')
     parser.add_argument('--scrub_no_kl_combined', action='store_true', help='Run HP tuning for yaum model')
-    
+    parser.add_argument('--finetune', action='store_true', help='Run HP tuning for yaum model')
 
     args = parser.parse_args()
     
@@ -92,6 +87,8 @@ if __name__ == "__main__":
         unlearning_models.append('scrub_no_kl_2')
     if args.scrub_no_kl_combined:
         unlearning_models.append('scrub_no_kl_combined')
+    if args.finetune:
+        unlearning_models.append('finetune')
 
     attacks = [args.attack_type]
     datasets = [args.dataset]

@@ -40,5 +40,26 @@
             "weight_decay": 2.9647171883060176e-05,
             "training_epochs": 900
         }
+    },
+    "Cora": {
+        "gcn": {
+            "train_lr": 0.0013920565001657751,
+            "weight_decay": 2.8699101620644948e-05,
+            "training_epochs": 950
+        }
+    },
+    "CS": {
+        "gcn": {
+            "train_lr": 0.08279552614827866,
+            "weight_decay": 1.1103190047118906e-05,
+            "training_epochs": 700
+        }
+    },
+    "Amazon": {
+        "gcn": {
+            "train_lr": 0.03543799142602512,
+            "weight_decay": 1.2493423855287454e-05,
+            "training_epochs": 500
+        }
     }
 }

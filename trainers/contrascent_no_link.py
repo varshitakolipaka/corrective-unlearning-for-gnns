@@ -23,7 +23,10 @@ import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 import seaborn as sns
 
-def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test", name=""):
+
+def plot_embeddings(
+    args, model, data, class1, class2, is_dr=False, mask="test", name=""
+):
     # Set the model to evaluation mode
     model.eval()
 
@@ -69,7 +72,7 @@ def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test",
     plt.figure(figsize=(8, 8), tight_layout=True)
     sns.set(style="whitegrid")
 
-    plt.grid(True, linestyle='-', alpha=0.7)
+    plt.grid(True, linestyle="-", alpha=0.7)
 
     # Convert labels to numpy for processing
     labels = labels.cpu().numpy()
@@ -79,41 +82,45 @@ def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test",
 
     # Plot each class with its unique color (non-poisoned classes will have reduced opacity)
     for i, cls in enumerate(other_classes):
-        class_mask = (labels == cls)
+        class_mask = labels == cls
         plt.scatter(
-            pre_embeddings[class_mask, 0], 
-            pre_embeddings[class_mask, 1], 
-            color=color_palette[i], 
+            pre_embeddings[class_mask, 0],
+            pre_embeddings[class_mask, 1],
+            color=color_palette[i],
             alpha=0.25,  # Slightly lower opacity for non-poisoned classes
-            s=50
+            s=50,
         )
 
     # Plot class1 (poisoned class)
     plt.scatter(
-        pre_embeddings[class1_mask, 0], 
-        pre_embeddings[class1_mask, 1], 
-        color='blue', 
-        alpha=0.6, 
-        s=120, 
-        edgecolors='black', 
-        linewidths=2  # Thicker borders
+        pre_embeddings[class1_mask, 0],
+        pre_embeddings[class1_mask, 1],
+        color="blue",
+        alpha=0.6,
+        s=120,
+        edgecolors="black",
+        linewidths=2,  # Thicker borders
     )
 
     # Plot class2 (poisoned class)
     plt.scatter(
-        pre_embeddings[class2_mask, 0], 
-        pre_embeddings[class2_mask, 1], 
-        color='red', 
-        alpha=0.6, 
-        s=120, 
-        edgecolors='black', 
-        linewidths=2  # Thicker borders
+        pre_embeddings[class2_mask, 0],
+        pre_embeddings[class2_mask, 1],
+        color="red",
+        alpha=0.6,
+        s=120,
+        edgecolors="black",
+        linewidths=2,  # Thicker borders
     )
 
     # Keep x-axis and y-axis ticks without labels and title
-    plt.xticks(ticks=plt.xticks()[0], labels=[''] * len(plt.xticks()[0]))  # Remove x-axis labels
-    plt.yticks(ticks=plt.yticks()[0], labels=[''] * len(plt.yticks()[0]))  # Remove y-axis labels
-    plt.title('')  # Remove title
+    plt.xticks(
+        ticks=plt.xticks()[0], labels=[""] * len(plt.xticks()[0])
+    )  # Remove x-axis labels
+    plt.yticks(
+        ticks=plt.yticks()[0], labels=[""] * len(plt.yticks()[0])
+    )  # Remove y-axis labels
+    plt.title("")  # Remove title
     plt.gca().legend().set_visible(False)  # Remove legend
 
     # Ensure the grid is visible
@@ -121,13 +128,19 @@ def plot_embeddings(args, model, data, class1, class2, is_dr=False, mask="test",
 
     # Save the plot
     os.makedirs("./plots", exist_ok=True)
-    plt.savefig(f"./plots/{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}_{name}_embeddings.png", format='png', bbox_inches='tight')
+    plt.savefig(
+        f"./plots/{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}_{name}_embeddings.png",
+        format="png",
+        bbox_inches="tight",
+    )
     plt.show()
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 with open("classes_to_poison.json", "r") as f:
     class_dataset_dict = json.load(f)
+
 
 def time_it(func):
     def wrapper(*args, **kwargs):
@@ -473,7 +486,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
 
         return pos_dist, neg_dist
 
-    def run_sage_batch(self, batch_size=128):
+    def run_sage_batch(self, batch_size=64):
         st = time.time()
 
         sample_indices = torch.where(self.data.sample_mask)[0]
@@ -489,35 +502,52 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
             batch_indices = sample_indices[i : i + batch_size]
             batch_size = len(batch_indices)
 
-            # Vectorize batch_positive_samples
             batch_positive_samples = [
                 list(self.subset_dict[idx.item()] - attacked_set)
                 for idx in batch_indices
             ]
+            batch_negative_samples = [list(attacked_set) for _ in range(batch_size)]
 
-            # Max lengths can be computed once per loop iteration
+            # Pad and create dense batches
             max_pos = max(len(s) for s in batch_positive_samples)
-            max_neg = len(
-                attacked_list
-            )  # Always fixed since attacked_set size won't change
+            max_neg = max(len(s) for s in batch_negative_samples)
 
-            # Preallocate memory for tensors
-            batch_pos = torch.zeros((batch_size, max_pos), dtype=torch.long)
-            batch_neg = torch.zeros((batch_size, max_neg), dtype=torch.long)
-            mask_pos = torch.zeros((batch_size, max_pos), dtype=torch.float32)
-            mask_neg = torch.ones((batch_size, max_neg), dtype=torch.float32)  # Fixed
+            batch_pos = torch.stack(
+                [
+                    torch.tensor(s + [0] * (max_pos - len(s)))
+                    for s in batch_positive_samples
+                ]
+            )
+            batch_neg = torch.stack(
+                [
+                    torch.tensor(s + [0] * (max_neg - len(s)))
+                    for s in batch_negative_samples
+                ]
+            )
 
-            for idx, pos_samples in enumerate(batch_positive_samples):
-                pos_len = len(pos_samples)
-                batch_pos[idx, :pos_len] = torch.tensor(pos_samples)
-                mask_pos[idx, :pos_len] = 1.0
+            mask_pos = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_pos - len(s)))
+                        for s in batch_positive_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
 
-            # Move everything to the correct device
-            device = self.embeddings.device
-            batch_pos, batch_neg = batch_pos.to(device), batch_neg.to(device)
-            mask_pos, mask_neg = mask_pos.to(device).unsqueeze(-1), mask_neg.to(
-                device
-            ).unsqueeze(-1)
+            mask_neg = (
+                torch.stack(
+                    [
+                        torch.tensor([1] * len(s) + [0] * (max_neg - len(s)))
+                        for s in batch_negative_samples
+                    ]
+                )
+                .float()
+                .unsqueeze(-1)
+                .to(device)
+            )
 
             st_2 = time.time()
             try:
@@ -532,7 +562,9 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
 
             total_loss += batch_loss
 
-        return total_loss
+        # calculate average dot product between each triplet of anchor, positive and negative samples
+
+        return total_loss / batch_size
 
     def get_distances_edge(self, batch_size=64):
         # attacked edge index contains all the edges that were maliciously added
@@ -700,11 +732,48 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         descent_optimizer = torch.optim.Adam(
             self.model.parameters(), lr=args.descent_lr
         )
-        
+
         # # plot embeddings
         # plot_embeddings(args, self.model, self.data, class1=class_dataset_dict[args.dataset]["class1"], class2=class_dataset_dict[args.dataset]["class2"], is_dr=True, mask="test", name=f"unlearning_og")
+        # self.model.eval()
+        # self.embeddings = self.model(
+        #                 self.data.x, self.data.edge_index
+        #             )
 
-        # attacked idx must be a list of nodes
+        # sample_indices = torch.where(self.data.sample_mask)[0]
+        # attacked_list = list(self.attacked_idx)
+        # # attacked idx must be a list of nodes
+        # # contrastive_losses = {}
+
+        # avg_pos_dot = {}
+        # avg_neg_dot = {}
+
+        # pos_dot = []
+        # neg_dot = []
+        # for sample in sample_indices:
+        #     anchor = self.embeddings[sample].unsqueeze(0)
+        #     pos = self.embeddings[list(self.subset_dict[sample.item()])].unsqueeze(0)
+        #     neg = self.embeddings[attacked_list].unsqueeze(0)
+
+        #     # add normalised dot product
+
+        #     for i in range(pos.shape[1]):
+        #         pos_emb = pos[:, i]
+        #         pos_dot.append(torch.dot(anchor.squeeze(), pos_emb.squeeze()) / (torch.norm(anchor.squeeze()) * torch.norm(pos_emb.squeeze())))
+        #     for i in range(neg.shape[1]):
+        #         neg_emb = neg[:, i]
+        #         neg_dot.append(torch.dot(anchor.squeeze(), neg_emb.squeeze()) / (torch.norm(anchor.squeeze()) * torch.norm(neg_emb.squeeze())))
+        
+        # avg_pos_dot[0] = torch.mean(torch.tensor(pos_dot)).item()
+        # avg_neg_dot[0] = torch.mean(torch.tensor(neg_dot)).item()
+
+        # print(
+        #     f"Average positive dot product before unlearning: {torch.mean(torch.tensor(pos_dot))}"
+        # )
+        # print(
+        #     f"Average negative dot product before unlearning: {torch.mean(torch.tensor(neg_dot))}"
+        # )
+
         for epoch in trange(args.steps, desc="Unlearning"):
             self.save_best()
             for i in range(args.contrastive_epochs_1 + args.contrastive_epochs_2):
@@ -721,6 +790,10 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                     #     pos_dist, neg_dist, margin=args.contrastive_margin
                     # )
                     loss = self.run_sage_batch()
+
+                    # if epoch not in contrastive_losses:
+                    #     contrastive_losses[epoch] = []
+                    # contrastive_losses[epoch].append(loss.item())
 
                     loss.backward()
                     optimizer.step()
@@ -760,12 +833,74 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
                 if cutoff:
                     self.load_best()
                     return
+                
+            # self.model.eval()
+            # self.embeddings = self.model(
+            #     self.data.x, self.data.edge_index[:, self.data.dr_mask]
+            # )
             
+            # pos_dot = []
+            # neg_dot = []
+            # for sample in sample_indices:
+            #     anchor = self.embeddings[sample].unsqueeze(0)
+            #     pos = self.embeddings[list(self.subset_dict[sample.item()])].unsqueeze(0)
+            #     neg = self.embeddings[attacked_list].unsqueeze(0)
+            #     for i in range(pos.shape[1]):
+            #         pos_emb = pos[:, i]
+            #         pos_dot.append(torch.dot(anchor.squeeze(), pos_emb.squeeze()) / (torch.norm(anchor.squeeze()) * torch.norm(pos_emb.squeeze())))
+            #     for i in range(neg.shape[1]):
+            #         neg_emb = neg[:, i]
+            #         neg_dot.append(torch.dot(anchor.squeeze(), neg_emb.squeeze()) / (torch.norm(anchor.squeeze()) * torch.norm(neg_emb.squeeze())))
+            
+            # avg_pos_dot[epoch+1] = torch.mean(torch.tensor(pos_dot)).item()
+            # avg_neg_dot[epoch+1] = torch.mean(torch.tensor(neg_dot)).item()
+
             # plot embeddings
             # plot_embeddings(args, self.model, self.data, class1=class_dataset_dict[args.dataset]["class1"], class2=class_dataset_dict[args.dataset]["class2"], is_dr=True, mask="test", name=f"unlearning_{epoch}")
 
         # load best model
+        
+        # save dot products as json
+        # os.makedirs("prods", exist_ok=True)
+        # with open(
+        #     f"prods/dot_products_{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}.json",
+        #     "w",
+        # ) as f:
+        #     json.dump({"pos":avg_pos_dot, "neg": avg_neg_dot}, f, indent=4)
+
+        # # save losses as json
+        # with open(
+        #     f"contrastive_losses_{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}.json",
+        #     "w",
+        # ) as f:
+        #     json.dump(contrastive_losses, f, indent=4)
+
         self.load_best()
+
+        # self.embeddings = self.model(
+        #     self.data.x, self.data.edge_index[:, self.data.dr_mask]
+        # )
+
+        # pos_dot = []
+        # neg_dot = []
+        # for sample in sample_indices:
+        #     anchor = self.embeddings[sample].unsqueeze(0)
+        #     pos = self.embeddings[list(self.subset_dict[sample.item()])].unsqueeze(0)
+        #     neg = self.embeddings[attacked_list].unsqueeze(0)
+
+        #     for i in range(pos.shape[1]):
+        #         pos_emb = pos[:, i]
+        #         pos_dot.append(torch.dot(anchor.squeeze(), pos_emb.squeeze()))
+        #     for i in range(neg.shape[1]):
+        #         neg_emb = neg[:, i]
+        #         neg_dot.append(torch.dot(anchor.squeeze(), neg_emb.squeeze()))
+
+        # print(
+        #     f"Average positive dot product after unlearning: {torch.mean(torch.tensor(pos_dot))}"
+        # )
+        # print(
+        #     f"Average negative dot product after unlearning: {torch.mean(torch.tensor(neg_dot))}"
+        # )
 
     def train_edge(self):
         # attack idx must be a list of tuples (u,v)

@@ -247,7 +247,11 @@ hp_tuning_params_dict = {
         "unlearn_lr": (1e-5, 1e-1, "log"),
         "weight_decay": (1e-5, 1e-1, "log"),
         "unlearning_epochs": (range(500, 1000, 50), "categorical"),
-        "heads": ([1, 2, 4, 8], "categorical"),
+    },
+    "finetune": {
+        "unlearn_lr": (1e-5, 1e-1, "log"),
+        "weight_decay": (1e-5, 1e-1, "log"),
+        "unlearning_epochs": (range(50, 200, 50), "categorical"),
     },
     "gnndelete": {
         "unlearn_lr": (1e-5, 1e-1, "log"),
@@ -313,7 +317,7 @@ hp_tuning_params_dict = {
         "unlearn_lr": (1e-4, 1e-1, "log"),
         # "contrastive_margin": (1, 10, "log"),
         # "contrastive_lambda": (0.0, 1.0, "float"),
-        "contrastive_frac": (0.02, 0.5, "float"),
+        "contrastive_frac": (0.01, 0.5, "float"),
         "k_hop": (1, 2, "int"),
         # "ascent_lr": (1e-6, 1e-3, "log"),
         "descent_lr": (1e-4, 1e-1, "log"),
@@ -541,7 +545,7 @@ if __name__ == "__main__":
         study.optimize(objective_func, n_trials=1)
     elif args.unlearning_model == "retrain" or args.unlearning_model == "gif":
         study.optimize(objective_func, n_trials=30)
-    # elif args.unlearning_model == "contrastive" or args.unlearning_model == "contra_2":
-    #     study.optimize(objective_func, n_trials=200)
-    else:
+    elif args.unlearning_model == "cacdc" or args.unlearning_model == "contra_2":
         study.optimize(objective_func, n_trials=100)
+    else:
+        study.optimize(objective_func, n_trials=50)

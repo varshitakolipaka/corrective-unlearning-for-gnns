@@ -570,4 +570,4 @@ if __name__ == "__main__":
     # elif args.unlearning_model == "contrastive" or args.unlearning_model == "contra_2":
     #     study.optimize(objective_func, n_trials=200)
     else:
-        study.optimize(objective_func, n_trials=50)
+        study.optimize(objective_func, n_trials=30)

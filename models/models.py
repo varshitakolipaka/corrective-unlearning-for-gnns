@@ -28,7 +28,6 @@ class GCN(nn.Module):
         x2 = self.conv2(x1, edge_index)
         x2 = F.relu(x2)
         x3 = self.conv3(x2, edge_index)
-        x3 = F.relu(x3)
         return x3
 
     def decode(self, z, pos_edge_index, neg_edge_index=None):
