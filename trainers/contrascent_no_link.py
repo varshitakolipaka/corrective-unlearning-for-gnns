@@ -22,6 +22,8 @@ from .base import Trainer
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 import seaborn as sns
+# Import sampler module
+from .samplers import get_sampler
 
 
 def plot_embeddings(
@@ -212,6 +214,19 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         self.og_model = copy.deepcopy(model)
         self.og_model.eval()
         self.og_model.to(device)
+        
+        # Get sampling strategy and metric from args
+        sampling_strategy = getattr(args, 'sampling_strategy', "megu_sampling")
+        distance_metric = getattr(args, 'distance_metric', "l1")
+        
+        # Initialize sampler with appropriate strategy and metric
+        self.sampler = get_sampler(sampling_strategy, metric=distance_metric)
+        
+        # Print sampler info
+        if hasattr(self.sampler, 'metric'):
+            print(f"Using {self.sampler.__class__.__name__} with {self.sampler.metric.upper()} distance metric")
+        else:
+            print(f"Using {self.sampler.__class__.__name__}")
 
     def reverse_features(self, features):
         reverse_features = features.clone()
@@ -225,74 +240,19 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         return reverse_features
 
     def get_sample_points(self):
-        if self.args.request == "edge":
-            og_logits = F.softmax(self.model(self.data.x, self.data.edge_index), dim=1)
-            temp_features = self.data.x.clone()
-            reverse_feature = self.reverse_features(temp_features)
-            final_logits = F.softmax(
-                self.model(reverse_feature, self.data.edge_index), dim=1
-            )
-            diff = torch.abs(og_logits - final_logits)
-            diff = torch.mean(diff, dim=1)
-            diff = diff[self.data.poisoned_nodes]
-            frac = self.args.contrastive_frac
-            _, indices = torch.topk(
-                diff, int(frac * len(self.data.poisoned_nodes)), largest=True
-            )
-            influence_nodes_with_unlearning_nodes = self.data.poisoned_nodes[indices]
-            print(f"Nodes influenced: {len(influence_nodes_with_unlearning_nodes)}")
-            self.data.sample_mask = torch.zeros(self.data.num_nodes, dtype=torch.bool)
-            self.data.sample_mask[influence_nodes_with_unlearning_nodes] = True
-
-            poisoned_edges = self.data.edge_index[:, self.data.df_mask]
-            negative_sample_dict = {int: set()}
-
-            for i in range(len(poisoned_edges[0])):
-                toNode = poisoned_edges[0][i].item()
-                fromNode = poisoned_edges[1][i].item()
-
-                if toNode not in negative_sample_dict:
-                    negative_sample_dict[toNode] = set()
-                negative_sample_dict[toNode].add(fromNode)
-
-                if fromNode not in negative_sample_dict:
-                    negative_sample_dict[fromNode] = set()
-                negative_sample_dict[fromNode].add(toNode)
+        """Use the sampler module to identify influenced nodes"""
+        print(f"Using {self.sampler.__class__.__name__} to identify influenced nodes...")
+        
+        # Get sample mask and negative sample dict from the sampler
+        self.data.sample_mask, negative_sample_dict = self.sampler.sample_points(
+            self.model, self.data, 
+            self.attacked_idx if self.args.request == "node" else None, 
+            self.args
+        )
+        
+        # Store negative sample dict for edge attacks
+        if self.args.request == "edge" and negative_sample_dict is not None:
             self.negative_sample_dict = negative_sample_dict
-            return
-
-        subset, _, _, _ = k_hop_subgraph(
-            self.attacked_idx.clone().detach(), self.args.k_hop, self.data.edge_index
-        )
-
-        # remove attacked nodes from the subset
-        subset = subset[~np.isin(subset.cpu(), self.attacked_idx.cpu())]
-
-        og_logits = F.softmax(self.model(self.data.x, self.data.edge_index), dim=1)
-        temp_features = self.data.x.clone()
-        reverse_feature = self.reverse_features(temp_features)
-        final_logits = F.softmax(
-            self.model(reverse_feature, self.data.edge_index), dim=1
-        )
-
-        diff = torch.abs(og_logits - final_logits)
-
-        # average across all classes
-        diff = torch.mean(diff, dim=1)
-
-        # take diffs of only the subset without the attacked nodes
-        diff = diff[subset]
-
-        #  get the top 10% of the indices
-        frac = self.args.contrastive_frac
-        _, indices = torch.topk(diff, int(frac * len(subset)), largest=True)
-
-        influence_nodes_with_unlearning_nodes = indices
-
-        print(f"Nodes influenced: {len(influence_nodes_with_unlearning_nodes)}")
-
-        self.data.sample_mask = torch.zeros(self.data.num_nodes, dtype=torch.bool)
-        self.data.sample_mask[influence_nodes_with_unlearning_nodes] = True
 
     def ascent_loss(self, mask):
         return -F.cross_entropy(self.embeddings[mask], self.data.y[mask])
@@ -974,6 +934,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         self.load_best()
 
     def train(self):
+        print("Initializing ContrastiveAscentNoLinkTrainer")
 
         # attack_idx is an extra needed parameter which is defined above in both node and edge functions
         self.data.retain_mask = self.data.train_mask.clone()
@@ -983,6 +944,7 @@ class ContrastiveAscentNoLinkTrainer(Trainer):
         self.start_time = time.time()
         self.best_model_time = self.start_time
         if self.args.request == "node":
+            print("Training node unlearning")
             self.train_node()
         elif self.args.request == "edge":
             self.train_edge()

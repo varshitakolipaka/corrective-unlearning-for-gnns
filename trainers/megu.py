@@ -99,6 +99,11 @@ class MeguTrainer(Trainer):
 
         self.num_layers = 2
         self.adj = sparse_mx_to_torch_sparse_tensor(normalize_adj(to_scipy_sparse_matrix(self.data.edge_index)))
+        
+        # Initialize adaptive threshold parameters with defaults or from args
+        self.init_alpha = getattr(args, 'megu_init_alpha', 0.1)  # Initial threshold
+        self.gamma = getattr(args, 'megu_gamma', 0.1)  # Step size
+        print(self.gamma)
 
     def train_test_split(self):
         if hasattr(self.data, 'train_mask') and hasattr(self.data, 'test_mask'):
@@ -197,9 +202,11 @@ class MeguTrainer(Trainer):
         cos = nn.CosineSimilarity()
         sim = cos(pfeatures, re_pfeatures)
         
-        alpha = 0.1
-        gamma = 0.1
+        # Use the configurable parameters instead of hardcoded values
+        alpha = self.init_alpha
+        gamma = self.gamma
         max_val = 0.
+        
         while True:
             influence_nodes_with_unlearning_nodes = torch.nonzero(sim <= alpha).flatten().cpu()
             if len(influence_nodes_with_unlearning_nodes.view(-1)) > 0:
@@ -230,13 +237,6 @@ class MeguTrainer(Trainer):
         neighbor_nodes_mask = torch.from_numpy(np.isin(np.arange(self.data.num_nodes), neighbor_nodes))
 
         return neighbor_nodes_mask
-
-    # def reverse_features(self, features):
-    #     reverse_features = features.clone()
-    #     for idx in self.temp_node:
-    #         reverse_features[idx] = 1 - reverse_features[idx]
-
-    #     return reverse_features
 
     def reverse_features(self, features):
         reverse_features = features.clone()

@@ -52,7 +52,7 @@ def parse_args():
     # GAT Heads
     parser.add_argument('--heads', type=int, default=8, help='number of heads for GATConv')
 
-    parser.add_argument('--training_epochs', type=int, default=700, help='number of epochs to train')
+    parser.add_argument('--training_epochs', type=int, default=7, help='number of epochs to train')
     parser.add_argument('--valid_freq', type=int, default=30, help='# of epochs to do validation')
     parser.add_argument('--checkpoint_dir', type=str, default='./checkpoint', help='checkpoint folder')
     parser.add_argument('--alpha', type=float, default=0.5, help='alpha in loss function')
@@ -111,10 +111,23 @@ def parse_args():
     parser.add_argument('--steps', type=int, default=10, help="steps of ascent and descent")
     parser.add_argument('--ascent_const', type=int, default=0.001, help="constant for ascent")
 
+    # sampling strategies for contrastive
+
+    parser.add_argument('--sampling_strategy', type=str, default='megu_sampling', 
+                        choices=['megu_sampling', 'logit_diff_topk', 'l1_logit_diff_topk'],
+                        help='Strategy for sampling influenced nodes (megu_sampling is also used for CACDC)')
+    parser.add_argument('--distance_metric', type=str, default='l1', 
+                        choices=['l1', 'l2', 'kl', 'js', 'cosine'],
+                        help='Distance metric for logit comparison in LogitDiffTopKSampler')
+
     # MEGU
     parser.add_argument('--kappa', type=float, default=0.01)
     parser.add_argument('--alpha1', type=float, default=0.8)
     parser.add_argument('--alpha2', type=float, default=0.5)
+    parser.add_argument('--megu_init_alpha', type=float, default=0.1,
+                        help='Initial threshold for MEGU neighbor selection. Lower values select fewer nodes initially.')
+    parser.add_argument('--megu_gamma', type=float, default=0.001,
+                        help='Step size for MEGU adaptive threshold. Smaller values provide finer-grained control and may help if too many nodes are being selected.')
 
     # SSD
     parser.add_argument('--SSDdampening', type=float, default=10, help='SSD: lambda aka dampening constant, lower leads to more forgetting')
