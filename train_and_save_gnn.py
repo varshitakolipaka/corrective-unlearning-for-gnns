@@ -56,6 +56,19 @@ def train():    # dataset
     if args.train_oracle:
         clean_trainer.train()
     else:
+        
+        if args.attack_type != "trigger":
+            print("ACC__ : ", clean_trainer.evaluate())
+            forg, util, forget_f1, util_f1 = clean_trainer.get_score(
+                args.attack_type,
+                class1=class_dataset_dict[args.dataset]["class1"],
+                class2=class_dataset_dict[args.dataset]["class2"],
+            )
+
+            print(
+                f"==OG Model==\nForg Accuracy: {forg}, Util Accuracy: {util}, Forg F1: {forget_f1}, Util F1: {util_f1}"
+            )
+        
         print("Not training oracle")
         return clean_data
 
@@ -181,7 +194,8 @@ def poison(clean_data=None):
     )
     
     # ask the user if they want to save the model
-    save_model = input("Do you want to save the model? (y/n): ")
+    # save_model = input("Do you want to save the model? (y/n): ")
+    save_model = "y"
     
     if save_model == "y":
 

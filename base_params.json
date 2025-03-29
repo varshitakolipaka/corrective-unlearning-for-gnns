@@ -1,9 +1,9 @@
 {
     "Computers": {
         "gcn": {
-            "train_lr": 0.010615023051907105,
-            "weight_decay": 2.5053581973852002e-05,
-            "training_epochs": 800
+            "train_lr": 0.014974895266177558,
+            "weight_decay": 1.2089113459189891e-05,
+            "training_epochs": 900
         }
     },
     "DBLP": {
@@ -15,8 +15,8 @@
     },
     "Physics": {
         "gcn": {
-            "train_lr": 0.0025369953854535126,
-            "weight_decay": 5.441174578296056e-05,
+            "train_lr": 0.0059634546891714334,
+            "weight_decay": 0.00015030256833470162,
             "training_epochs": 500
         }
     },
@@ -43,23 +43,23 @@
     },
     "Cora": {
         "gcn": {
-            "train_lr": 0.0013920565001657751,
-            "weight_decay": 2.8699101620644948e-05,
-            "training_epochs": 950
+            "train_lr": 0.062490568145812025,
+            "weight_decay": 5.087292988956397e-05,
+            "training_epochs": 600
         }
     },
     "CS": {
         "gcn": {
-            "train_lr": 0.08279552614827866,
-            "weight_decay": 1.1103190047118906e-05,
-            "training_epochs": 700
+            "train_lr": 0.028206105890037858,
+            "weight_decay": 1.7436707098558048e-05,
+            "training_epochs": 950
         }
     },
     "Amazon": {
         "gcn": {
-            "train_lr": 0.03543799142602512,
-            "weight_decay": 1.2493423855287454e-05,
-            "training_epochs": 500
+            "train_lr": 0.01128933776642952,
+            "weight_decay": 1.213282256037546e-05,
+            "training_epochs": 850
         }
     }
 }

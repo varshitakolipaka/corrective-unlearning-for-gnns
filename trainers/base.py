@@ -258,6 +258,8 @@ class Trainer:
         return acc, -1, f1
 
     def calculate_PSR(self):
+        if(not hasattr(self.data, 'clean_val_mask')):
+            return 0, 0
         z = self.z
         if self.is_trigg_val:
             # mask = self.data.poison_val_mask

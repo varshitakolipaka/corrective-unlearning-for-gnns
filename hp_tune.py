@@ -311,7 +311,7 @@ hp_tuning_params_dict = {
     },
     "contra_2": {
         "contrastive_epochs_1": (1, 10, "int"),
-        "contrastive_epochs_2": (1, 30, "int"),
+        # "contrastive_epochs_2": (1, 30, "int"),
         "steps": (1, 10, "int"),
         # "maximise_epochs": (5, 30, "int"),
         "unlearn_lr": (1e-4, 1e-1, "log"),
@@ -320,7 +320,7 @@ hp_tuning_params_dict = {
         "contrastive_frac": (0.01, 0.5, "float"),
         "k_hop": (1, 2, "int"),
         # "ascent_lr": (1e-6, 1e-3, "log"),
-        "descent_lr": (1e-4, 1e-1, "log"),
+        # "descent_lr": (1e-4, 1e-1, "log"),
         # "scrubAlpha": (1e-6, 10, "log"),
     },
     "contrascent": {

@@ -708,22 +708,22 @@ class ContrastiveUnlearnTrainer_NEW(Trainer):
             avg_pos_dot[epoch + 1] = ((pos_dot * pos_mask).sum() / pos_mask.sum()).item()
             avg_neg_dot[epoch + 1] = neg_dot.mean().item()
                     
-        # save dot products as json
-        os.makedirs("prods", exist_ok=True)
-        print(f"Average positive dot product after unlearning: {avg_pos_dot}")
-        print(f"Average negative dot product after unlearning: {avg_neg_dot}")
-        with open(
-            f"prods/dot_products_{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}.json",
-            "w",
-        ) as f:
-            print(f"Saving dot products to file")
-            json.dump({"pos":avg_pos_dot, "neg": avg_neg_dot}, f, indent=4)
+        # # save dot products as json
+        # os.makedirs("prods", exist_ok=True)
+        # print(f"Average positive dot product after unlearning: {avg_pos_dot}")
+        # print(f"Average negative dot product after unlearning: {avg_neg_dot}")
+        # with open(
+        #     f"prods/dot_products_{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}.json",
+        #     "w",
+        # ) as f:
+        #     print(f"Saving dot products to file")
+        #     json.dump({"pos":avg_pos_dot, "neg": avg_neg_dot}, f, indent=4)
         
-        with open(
-            f"prods/contrastive_losses_{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}.json",
-            "w",
-        ) as f:
-            json.dump(contrastive_losses, f, indent=4)    
+        # with open(
+        #     f"prods/contrastive_losses_{args.dataset}_{args.attack_type}_{args.df_size}_{args.random_seed}.json",
+        #     "w",
+        # ) as f:
+        #     json.dump(contrastive_losses, f, indent=4)    
         
         # load best model
         self.load_best()

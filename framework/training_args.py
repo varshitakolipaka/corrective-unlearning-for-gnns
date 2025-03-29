@@ -101,8 +101,8 @@ def parse_args():
 
 
     # contrastive
-    parser.add_argument('--contrastive_epochs_1', type=int, default=0, help="epochs for contrastive unlearning")
-    parser.add_argument('--contrastive_epochs_2', type=int, default=10, help="epochs for contrastive unlearning")
+    parser.add_argument('--contrastive_epochs_1', type=int, default=10, help="epochs for contrastive unlearning")
+    parser.add_argument('--contrastive_epochs_2', type=int, default=0, help="epochs for contrastive unlearning")
     parser.add_argument('--maximise_epochs', type=int, default=0, help="epochs for grad asc in contrastive unlearning")
     parser.add_argument('--contrastive_margin', type=float, default=500, help="margin for the contrastive loss")
     parser.add_argument('--contrastive_lambda', type=float, default=0.8, help="weight for the task loss [1 - lambda] is used for the contrastive loss")
@@ -130,7 +130,7 @@ def parse_args():
     parser.add_argument('--log_name', type=str, default='default', help='log name')
 
     parser.add_argument('--linked', action='store_true', help='whether to use linked model')
-    
+
     parser.add_argument('--train_oracle', action='store_true', help='whether to train oracle model', default=False)
 
     args = parser.parse_args()

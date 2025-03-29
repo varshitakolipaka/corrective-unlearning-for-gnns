@@ -238,8 +238,6 @@ def poison(clean_data=None):
         # poisoned_indices = torch.tensor([poisoned_node])  # Track which node was attacked
         pass
 
-    exit()
-
     poisoned_data = poisoned_data.to(device)
 
     poisoned_model = utils.get_model(
@@ -373,9 +371,7 @@ if __name__ == "__main__":
     clean_data = train(load=True)
 
     # clean_data = train()
-    poisoned_data, poisoned_indices, poisoned_model = poison(clean_data)
-
-    exit()
+    poisoned_data, poisoned_indices, poisoned_model = poison()
     
     # load best params file
     with open("best_params.json", "r") as f:
